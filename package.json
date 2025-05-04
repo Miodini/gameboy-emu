@@ -1,0 +1,22 @@
+{
+  "name": "gameboy-emulator-js",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  
+  "scripts": {
+    "build": "tsc",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+  },
+  "keywords": ["emulator", "gameboy"],
+  "author": "Lucas Mondini",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "ts-jest": "^29.3.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3",
+    "webpack": "^5.94.0"
+  }
+}
