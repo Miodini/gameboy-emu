@@ -1,6 +1,7 @@
-import Cpu from "./cpu/index.js"
+import Memory from "./memory"
+import BgPpu from "./ppu/bgPpu"
 
-const program = new Int8Array([0x01, 0xBA, 0x96])
+const mem = new Memory()
+const gpu = new BgPpu(mem)
 
-const cpu = new Cpu(program)
-cpu.start()
+gpu._test()

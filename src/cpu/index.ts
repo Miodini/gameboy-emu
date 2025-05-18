@@ -1,5 +1,5 @@
 import type { Byte, Word, Instruction } from '../types'
-import Alu from "./alu.js"
+import Alu from "./alu"
 import { int8, uint8, int16 } from '../utils'
 
 export default class Cpu extends Alu {
