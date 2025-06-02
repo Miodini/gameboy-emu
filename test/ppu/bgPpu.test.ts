@@ -5,11 +5,11 @@
 import 'jest-canvas-mock'
 import { describe, expect, it } from '@jest/globals'
 import Memory from '../../src/memory'
-import BgPpu from '../../src/ppu/bgPpu'
+import Ppu from '../../src/ppu'
 
 describe('BgPpu', () => {
   const mem = new Memory()
-  const bgPpu = new BgPpu(mem)
+  const bgPpu = new Ppu(mem)
 
   it('should render a test screen', () => {
     expect(document.querySelector('#screen > canvas')).not.toBeNull()

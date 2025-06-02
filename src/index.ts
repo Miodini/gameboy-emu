@@ -1,7 +1,7 @@
 import Memory from "./memory"
-import BgPpu from "./ppu/bgPpu"
+import Ppu from "./ppu"
 
 const mem = new Memory()
-const gpu = new BgPpu(mem)
+const ppu = new Ppu(mem)
 
-gpu._test()
+ppu._test()

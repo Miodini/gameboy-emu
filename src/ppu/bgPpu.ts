@@ -1,26 +1,49 @@
-import Ppu from './index'
-import { pkmnVramDump } from '../../mock/mocks'
+import PpuBase from './ppuBase'
+import Memory from '../memory'
+import { Addresses, Sizes } from './constants'
 import { getBit, int8, uint16 } from '../utils'
 
-export default class BgPpu extends Ppu {
-  /** @override */
-  protected draw () {
+export default class BgPpu extends PpuBase {
+  readonly colorMap = {
+    0: '#FFFFFF',
+    1: '#AAAAAA',
+    2: '#858585',
+    3: '#000000' 
+  }
+
+  constructor (mem: Memory, canvas: HTMLCanvasElement, pixelSize: number) {
+    super(mem, canvas, pixelSize)
+  }
+
+  /** Draws a screen-full of tiles. Some are displayed outside of the screen boundaries */
+  public draw () {
     if (getBit(this.mem.LCDC, 0) === 0) {
       return
     }
 
+    let screenX = 0, screenY = 0
     const selectedTileMap = getBit(this.mem.LCDC, 3) === 0 ? 0 : 1
     const selectedTileData = getBit(this.mem.LCDC, 4) === 0 ? 1 : 0
-    super.draw(selectedTileData, selectedTileMap)
-  }
+    const tileDataAddress = selectedTileData === 0 ? Addresses.TILE_DATA_BLOCK_0 : Addresses.TILE_DATA_BLOCK_2
+    const tileMapAddress = selectedTileMap === 0 ? Addresses.TILE_MAP_0 : Addresses.TILE_MAP_1
+    
+    for (let tileX = 0; tileX < Sizes.TILE_MAP; tileX++) {
+      for (let tileY = 0; tileY < Sizes.TILE_MAP; tileY++) {
+        const tileData: number[] = []
+        let tileIndex = this.mem.load8(uint16(tileMapAddress + tileX * Sizes.TILE_MAP + tileY))
 
-  public _test = () => {
-    this.mem.SCX = int8(0)
-    this.mem.SCY = int8(16)
-    this.mem.LCDC = int8(1)
-    pkmnVramDump.forEach((byte, index) => {
-      this.mem.store8(int8(byte), uint16(0x8000 + index))
-    })
-    this.draw()
-  } 
+        if (selectedTileData === 1) {
+          tileIndex = int8(tileIndex) // Convert to signed 8-bit integer
+        }
+        
+        for (let i = 0; i < Sizes.TILE_DATA; i++) {
+          tileData.push(this.mem.load8(uint16(tileDataAddress + (tileIndex * Sizes.TILE_DATA) + i)))
+        }
+        this.drawTile(tileData, screenX, screenY)
+        screenX += Sizes.TILE_PIXELS
+      }
+      screenX = 0
+      screenY += Sizes.TILE_PIXELS
+    }
+  }
 }
