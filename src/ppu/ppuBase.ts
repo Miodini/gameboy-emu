@@ -71,19 +71,54 @@ export default abstract class PpuBase {
     this.canvasCtx.fillRect(screenX, screenY, this.pixelSize, this.pixelSize)
   }
 
-  protected drawTile (tileData: number[], x: number, y: number) {
+  // protected drawTile (tileData: number[], x: number, y: number, { flipX = false, flipY = false } = {}) {
+  //   let xCurrent = x, yCurrent = y
+
+  //   // Loops in reverse order if flipY is true
+  //   for (
+  //     let i = flipY ? tileData.length : 0;
+  //     flipY ? i >= 0 : i < tileData.length;
+  //     i = flipY ? i - 2 : i + 2
+  //   ) {
+  //     const lowByte = tileData[i], highByte = tileData[i + 1]  
+  //     const colorArray = this.getTileRow(lowByte, highByte)
+
+  //     colorArray.forEach(color => {
+  //       this.drawPixel(color, xCurrent, yCurrent)
+  //       xCurrent++
+  //       if (xCurrent >= x + Sizes.TILE_PIXELS) {
+  //         xCurrent = x
+  //         yCurrent++
+  //       }
+  //     })
+  //   }
+  // }
+
+  protected drawTile (tileData: number[], x: number, y: number, { flipX = false, flipY = false } = {}) {
     let xCurrent = x, yCurrent = y
 
+    if (flipX) {
+      xCurrent = x + Sizes.TILE_PIXELS - 1
+    }
+    if (flipY) {
+      yCurrent = y + Sizes.TILE_PIXELS - 1
+    }
+    // Loops in reverse order if flipY is true
     for (let i = 0; i < tileData.length; i += 2) {
       const lowByte = tileData[i], highByte = tileData[i + 1]  
       const colorArray = this.getTileRow(lowByte, highByte)
 
       colorArray.forEach(color => {
         this.drawPixel(color, xCurrent, yCurrent)
-        xCurrent++
-        if (xCurrent >= x + Sizes.TILE_PIXELS) {
+        xCurrent += flipX ? -1 : 1
+        if (flipX) {
+          if (xCurrent < x) {
+            xCurrent = x + Sizes.TILE_PIXELS - 1
+            yCurrent += flipY ? -1 : 1
+          }
+        } else if (xCurrent >= x + Sizes.TILE_PIXELS) {
           xCurrent = x
-          yCurrent++
+          yCurrent += flipY ? -1 : 1
         }
       })
     }

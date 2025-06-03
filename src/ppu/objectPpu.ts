@@ -24,7 +24,7 @@ export default class ObjectPpu extends PpuBase {
       const x = this.mem.load8(uint16(oamAddress + 1)) - 8
       const tileIndex = this.mem.load8(uint16(oamAddress + 2))
       const attributes = this.mem.load8(uint16(oamAddress + 3))
-      // TODO: Handle attributes like flip and palette
+      // Ignoring palette for now
 
       const tileData: number[] = []
 
@@ -32,7 +32,7 @@ export default class ObjectPpu extends PpuBase {
         tileData.push(this.mem.load8(uint16(Addresses.TILE_DATA_BLOCK_0 + (tileIndex * Sizes.TILE_DATA) + j)))
       }
 
-      this.drawTile(tileData, x, y)
+      this.drawTile(tileData, x, y, { flipX: getBit(attributes, 6) === 1, flipY: getBit(attributes, 7) === 1})
     }
   }
 }
