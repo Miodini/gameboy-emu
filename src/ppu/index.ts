@@ -25,8 +25,8 @@ export default class Ppu {
 
   public _test = () => {
     this.mem.SCX = int8(0)
-    this.mem.SCY = int8(16)
-    this.mem.LCDC = int8(1)
+    this.mem.SCY = int8(0)
+    this.mem.LCDC = int8(0xeb)
 
     pkmnVramDump.forEach((byte, index) => {
       this.mem.store8(int8(byte), uint16(Addresses.VRAM + index))
