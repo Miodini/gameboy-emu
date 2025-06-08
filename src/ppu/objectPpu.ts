@@ -2,17 +2,24 @@ import PpuBase from './ppuBase'
 import Memory from '../memory'
 import { Addresses, Sizes } from './constants'
 import { getBit, uint8, uint16 } from '../utils'
+import { Colors } from './constants'
 
 export default class ObjectPpu extends PpuBase {
-  readonly colorMap = {
-    0: null, // Transparent
-    1: '#AAAAAA',
-    2: '#858585',
-    3: '#000000' 
+  constructor (mem: Memory) {
+    const screenMatrix: (Colors | null)[][] = new Array(Sizes.SCREEN_HEIGHT)
+
+    for (let i = 0; i < Sizes.SCREEN_HEIGHT; i++) {
+      screenMatrix[i] = new Array(Sizes.SCREEN_WIDTH).fill(null)
+    }  
+    super(mem, screenMatrix)
   }
 
-  constructor (mem: Memory, canvas: HTMLCanvasElement, pixelSize: number) {
-    super(mem, canvas, pixelSize)
+  /** 
+   * @override 
+   * Sprites' color 0 is transparent rather than white.
+  */
+  protected getColor (value: number): Colors | null {
+    return value === 0 ? null : super.getColor(value)
   }
 
   /** Draws objects (sprites) as defined in OAM 
@@ -54,5 +61,7 @@ export default class ObjectPpu extends PpuBase {
         this.drawTile(tileData, x, y + Sizes.TILE_PIXELS, {flipX, flipY})
       }
     }
+
+    return this.screenMatrix
   }
 }

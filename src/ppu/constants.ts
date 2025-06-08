@@ -21,3 +21,10 @@ export namespace Sizes {
   export const OAM_ENTRIES = 40 // Number of OAM entries
   export const OAM_ENTRY_SIZE = 4 // Bytes per OAM entry
 }
+
+export enum Colors {
+  WHITE = 1,
+  LIGHT_GRAY = 2,
+  DARK_GRAY = 3,
+  BLACK = 4
+}

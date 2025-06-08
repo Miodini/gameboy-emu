@@ -1,26 +1,20 @@
 import PpuBase from './ppuBase'
 import Memory from '../memory'
-import { Addresses, Sizes } from './constants'
+import { Addresses, Colors, Sizes } from './constants'
 import { getBit, int8, uint16 } from '../utils'
 
 export default class BgPpu extends PpuBase {
-  readonly colorMap = {
-    0: '#FFFFFF',
-    1: '#AAAAAA',
-    2: '#858585',
-    3: '#000000' 
-  }
+  constructor (mem: Memory) {
+    const screenMatrix: Colors[][] = new Array(Sizes.SCREEN_HEIGHT)
 
-  constructor (mem: Memory, canvas: HTMLCanvasElement, pixelSize: number) {
-    super(mem, canvas, pixelSize)
+    for (let i = 0; i < Sizes.SCREEN_HEIGHT; i++) {
+      screenMatrix[i] = new Array(Sizes.SCREEN_WIDTH).fill(Colors.WHITE)
+    }
+    super(mem, screenMatrix)
   }
 
   /** Draws a screen-full of tiles. Some are displayed outside of the screen boundaries */
   public draw () {
-    if (getBit(this.mem.LCDC, 0) === 0) {
-      return
-    }
-
     let screenX = 0, screenY = 0
     const selectedTileMap = getBit(this.mem.LCDC, 3) === 0 ? 0 : 1
     const selectedTileData = getBit(this.mem.LCDC, 4) === 0 ? 1 : 0
@@ -45,5 +39,7 @@ export default class BgPpu extends PpuBase {
       screenX = 0
       screenY += Sizes.TILE_PIXELS
     }
+
+    return this.screenMatrix
   }
 }
