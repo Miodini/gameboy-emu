@@ -3,7 +3,7 @@ import BgPpu from "./bgPpu"
 import ObjectPpu from "./objectPpu"
 import { Addresses, Colors, Sizes } from "./constants"
 import { pkmnVramDump, pkmnOamDump } from '../../mock/mocks'
-import { getBit, int8, uint16 } from "../utils"
+import { getBit, uint8, int8, uint16 } from "../utils"
 
 export default class Ppu {
   private readonly mem: Memory
@@ -42,6 +42,11 @@ export default class Ppu {
     /* The draw method of `bgPpu` and `objPpu` return arrays with color data
      * This method is the responsible for drawing the rects on the actual canvas
     */
+    if (getBit(this.mem.LCDC, 7) === 0) {
+      // If LCDC bit 7 is not set, the screen is blanked
+      this.canvasCtx.clearRect(0, 0, this.canvas.width, this.canvas.height)
+      return
+    }
     const bgScreenMatrix = this.bgPpu.draw()
     const objScreenMatrix = this.objPpu.draw()
 
@@ -53,6 +58,7 @@ export default class Ppu {
     const bgEnable = getBit(this.mem.LCDC, 0) === 1
 
     for (let y = 0; y < Sizes.SCREEN_HEIGHT; y++) {
+      this.mem.LY = uint8(y)
       for (let x = 0; x < Sizes.SCREEN_WIDTH; x++) {
         const color = bgScreenMatrix[x][y]
 
