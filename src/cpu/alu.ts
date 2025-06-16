@@ -1,6 +1,6 @@
 import type { Bit, BitPosition, Byte, Word } from '../types'
 import Registers from './registers'
-import Memory from '../memory/memory'
+import Memory from '../memory'
 import { bit, int8, int16, uint8, uint16 } from '../utils'
 
 /** Arithmetic Logic Unit */
