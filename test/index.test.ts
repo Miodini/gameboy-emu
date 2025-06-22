@@ -11,9 +11,9 @@ let cpu: Cpu
 
 beforeAll(() => {
   const fileContent = fs.readFileSync(path.resolve(__dirname, './testprogram.bin'))
-  const program = Int8Array.from(fileContent)
-
-  cpu = new Cpu(program)
+  
+  cpu = new Cpu()
+  cpu.mem.rom = new Int8Array(fileContent)
 })
 
 describe('Main test', () => {

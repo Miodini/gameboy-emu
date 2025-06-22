@@ -4,7 +4,7 @@ import { int8, int16, uint16 } from '../../src/utils.js'
 import { jest, describe, expect, test, beforeEach } from '@jest/globals'
 jest.mock('../../src/cpu')
 
-const cpu = new Cpu(new Int8Array(0))
+const cpu = new Cpu()
 
 function getRegisterValue(register: string): Byte | Word | null {
     return (cpu as any)[register] ?? null

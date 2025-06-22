@@ -3,7 +3,7 @@ import { Bit } from "../../src/types.js"
 import { bit, int8, int16 } from "../../src/utils.js"
 import { describe, expect, test, beforeEach } from "@jest/globals"
 
-const cpu = new Cpu(new Int8Array(0))
+const cpu = new Cpu()
 
 beforeEach(() => {
     // Reset registers before operating

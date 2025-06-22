@@ -11,24 +11,24 @@ describe('Memory', () => {
   })
 
   test('load8', () => {
-    memory.ram[address] = value8
+    memory.memory[address] = value8
 
     expect(memory.load8(address)).toBe(value8)
   })
   test('load16', () => {
-    memory.ram[address] = int8((value16 & 0xFF00) >> 8)
-    memory.ram[address + 1] = int8(value16 & 0x00FF)
+    memory.memory[address] = int8((value16 & 0xFF00) >> 8)
+    memory.memory[address + 1] = int8(value16 & 0x00FF)
 
     expect(memory.load16(address)).toBe(value16)
   })
   test('store8', () => {
     memory.store8(value8, address)
 
-    expect(memory.ram[address]).toBe(value8)
+    expect(memory.memory[address]).toBe(value8)
   })
   test('store16', () => {
     memory.store16(value16, address)
 
-    expect((memory.ram[address] << 8) | memory.ram[address + 1]).toBe(value16)
+    expect((memory.memory[address] << 8) | memory.memory[address + 1]).toBe(value16)
   })
 })

@@ -3419,14 +3419,6 @@ export default class Cpu extends Alu {
         },
     }
 
-    constructor (program: Int8Array) {
-        super()
-        const _program = program.slice(this.mem.rom.start, this.mem.rom.end)
-        _program.forEach((byte, i) => {
-            this.mem.store8(int8(byte), int16(i))
-        })
-    }
-
     start () {
         while (!this.stopFlag) {
             const instruction = this.instructions[uint8(this.mem.load8(this.PC))]

@@ -22,9 +22,17 @@
       border: 1px solid #000;
       background-color: white;
     }
+    .file-input {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+    }
   </style>
 </head>
 <body>
+  <div class="file-input">
+    <input type="file" id="fileInput" accept=".gb,.gbc" />
+  </div>
   <main>
     <h1>Gameboy Emulator</h1>
     <div id="screen"></div> <!-- Canvas placeholder -->
