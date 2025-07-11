@@ -5,7 +5,11 @@ import { bit, int8, int16, uint8, uint16 } from '../utils'
 
 /** Arithmetic Logic Unit */
 export default abstract class Alu extends Registers {
-    mem = new Memory()
+    mem: Memory
+    constructor (mem: Memory) {
+        super()
+        this.mem = mem
+    }
     /* ----- LOGIC OPERATIONS ----- */
     and (value: Byte) {
         this.A &= value

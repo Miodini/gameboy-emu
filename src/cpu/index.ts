@@ -1,5 +1,6 @@
 import type { Byte, Word, Instruction } from '../types'
 import Alu from "./alu"
+import Memory from '../memory'
 import { int8, uint8, int16 } from '../utils'
 
 export default class Cpu extends Alu {
@@ -3419,9 +3420,15 @@ export default class Cpu extends Alu {
         },
     }
 
+    constructor (mem: Memory) {
+        super(mem)
+    }
+
     start () {
-        while (!this.stopFlag) {
+        const execute = () => {
+            if (this.stopFlag) return
             const instruction = this.instructions[uint8(this.mem.load8(this.PC))]
+ 
             this.PC++
 
             // 8 bit
@@ -3436,13 +3443,14 @@ export default class Cpu extends Alu {
                 const word = this.mem.load8(this.PC) | (this.mem.load8(int16(this.PC + 1)) << 8)
 
                 this.PC += 2
-                console.log(word)
                 instruction.fn(word)
             }
             else {
                 instruction.fn()
             }
-            // if (interrupt) -> 
+            setTimeout(execute, instruction.cycles * 4) // 4 cycles per millisecond
         }
+
+        execute()
     }
 }

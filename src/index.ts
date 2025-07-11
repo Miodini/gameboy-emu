@@ -2,9 +2,9 @@ import Memory from "./memory"
 import Ppu from "./ppu"
 import Cpu from "./cpu"
 
-const cpu = new Cpu()
-// const mem = new Memory()
-// const ppu = new Ppu(mem)
+const mem = new Memory()
+const cpu = new Cpu(mem)
+const ppu = new Ppu(mem)
 
 
 const fileInput = document.getElementById('fileInput') as HTMLInputElement
@@ -19,7 +19,7 @@ fileInput.addEventListener('change', event => {
         const fileContent = new Int8Array(reader.result)
 
         cpu.mem.rom = fileContent
-        // cpu.start()
+        cpu.start()
       }
     }
     reader.readAsArrayBuffer(file)
