@@ -1440,7 +1440,8 @@ export default class Cpu extends Alu {
             args: 0,
             cycles: 4,
             fn: () => {
-                const instruction = 0xCB00 | this.mem.load8(this.PC)
+                const instruction = 0xCB00 | uint8(this.mem.load8(this.PC))
+
                 this.PC++
                 this.instructions[instruction].fn()
                 // TODO: await for the called instruction clock cycle
@@ -3424,33 +3425,28 @@ export default class Cpu extends Alu {
         super(mem)
     }
 
-    start () {
-        const execute = () => {
-            if (this.stopFlag) return
-            const instruction = this.instructions[uint8(this.mem.load8(this.PC))]
- 
+    execute = () => {
+        if (this.stopFlag) return
+        const instruction = this.instructions[uint8(this.mem.load8(this.PC))]
+
+        this.PC++
+
+        // 8 bit
+        if (instruction.args === 1) {
+            const byte = this.mem.load8(this.PC)
+
             this.PC++
-
-            // 8 bit
-            if (instruction.args === 1) {
-                const byte = this.mem.load8(this.PC)
-
-                this.PC++
-                instruction.fn(byte)
-            }
-            // 16 bit
-            else if (instruction.args === 2) {
-                const word = this.mem.load8(this.PC) | (this.mem.load8(int16(this.PC + 1)) << 8)
-
-                this.PC += 2
-                instruction.fn(word)
-            }
-            else {
-                instruction.fn()
-            }
-            setTimeout(execute, instruction.cycles * 4) // 4 cycles per millisecond
+            instruction.fn(byte)
         }
+        // 16 bit
+        else if (instruction.args === 2) {
+            const word = this.mem.load8(this.PC) | (this.mem.load8(int16(this.PC + 1)) << 8)
 
-        execute()
+            this.PC += 2
+            instruction.fn(word)
+        }
+        else {
+            instruction.fn()
+        }
     }
 }

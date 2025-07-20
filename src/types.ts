@@ -12,3 +12,24 @@ export type Instruction = {
   cycles: number,
   readonly fn: (param?: any) => void
 }
+export namespace WorkerTypes {
+  export enum MessageType {
+    Dump,
+    Load
+  }
+
+  export type LoadMessagePayload = {
+    romData: Int8Array,
+    canvas: OffscreenCanvas,
+    pixelSize: number
+  }
+
+  export type DumpMessagePayload = {
+    startAddress: number,
+    endAddress: number
+  }
+
+  export type WorkerMessage =
+    | { messageType: MessageType.Dump, payload: DumpMessagePayload }
+    | { messageType: MessageType.Load, payload: LoadMessagePayload }
+}

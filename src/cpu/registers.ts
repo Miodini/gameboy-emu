@@ -141,4 +141,14 @@ export default abstract class Registers {
         this.sp[0] = int8(value >> 8)
         this.sp[1] = int8(value)
     }
+
+    constructor () {
+        // Emulates the boot rom process
+        this.AF = 0x01B0
+        this.BC = 0x0013
+        this.DE = 0x00D8
+        this.HL = 0x014D
+        this.SP = 0xFFFE
+        this.PC = 0x0100
+    }
 }
