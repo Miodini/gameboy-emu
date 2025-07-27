@@ -1,6 +1,5 @@
 import type { Byte, Word, Instruction } from '../types'
 import Alu from "./alu"
-import Memory from '../memory'
 import { int8, uint8, int16 } from '../utils'
 
 export default class Cpu extends Alu {
@@ -1870,7 +1869,7 @@ export default class Cpu extends Alu {
         },
         0xFE: {
             name: 'CP d8',
-            args: 0,
+            args: 1,
             cycles: 8,
             fn: (byte: Byte) => this.cp(byte)
         },        
@@ -3421,12 +3420,8 @@ export default class Cpu extends Alu {
         },
     }
 
-    constructor (mem: Memory) {
-        super(mem)
-    }
-
     execute = () => {
-        if (this.stopFlag) return
+        if (this.stopFlag || this.haltFlag) return
         const instruction = this.instructions[uint8(this.mem.load8(this.PC))]
 
         this.PC++
