@@ -3,6 +3,7 @@
 
 SECTION "SumTwoNumbers", ROM0
 
+ORG $0100
 START:
   LD A, $05       ; Load the first number (5) into register A
   LD B, $03       ; Load the second number (3) into register B

@@ -1,4 +1,4 @@
-import type { Bit, BitPosition, Byte, Word } from '../types'
+import type { BitPosition, Int8, Uint8, Int16, Uint16 } from '../types'
 import Registers from './registers'
 import Memory from '../memory'
 import { bit, int8, int16, uint8, uint16 } from '../utils'
@@ -11,35 +11,35 @@ export default abstract class Alu extends Registers {
         this.mem = mem
     }
     /* ----- LOGIC OPERATIONS ----- */
-    and (value: Byte) {
+    and (value: Uint8) {
         this.A &= value
         this.flagZ = this.A === 0
         this.flagN = 0
         this.flagH = 1
         this.flagC = 0
     }
-    or (value: Byte) {
+    or (value: Uint8) {
         this.A |= value
         this.flagZ = this.A === 0
         this.flagN = 0
         this.flagH = 0
         this.flagC = 0  
     }
-    xor (value: Byte) {
+    xor (value: Uint8) {
         this.A ^= value
         this.flagZ = this.A === 0
         this.flagN = 0
         this.flagH = 0
         this.flagC = 0
     }
-    cp (value: Byte) {
+    cp (value: Int8) {
         this.flagZ = this.A - value === 0
         this.flagN = 1
         this.flagH = (this.A & 0x0F) < (value & 0x0F)
         this.flagC = this.A < value
     }
     /* ----- ARITHMETIC OPERATIONS -----*/
-    adc (value1: Byte, value2: Byte): void {
+    adc (value1: Int8, value2: Int8): void {
         const sum = value1 + value2 + this.flagC
 
         this.flagZ = sum === 0
@@ -48,7 +48,7 @@ export default abstract class Alu extends Registers {
         this.flagC = this.flagC ? uint8(sum) < uint8(value1) : uint8(sum) <= uint8(value1)
         this.A = sum
     }
-    add8 (value1: Byte, value2: Byte): void {
+    add8 (value1: Int8, value2: Int8): void {
         const sum = value1 + value2
 
         this.flagZ = sum === 0
@@ -57,7 +57,7 @@ export default abstract class Alu extends Registers {
         this.flagC = uint8(sum) < uint8(value1)
         this.A = sum
     }
-    add16 (value1: Word, value2: Word): Word {
+    add16 (value1: Int16, value2: Int16): Int16 {
         const sum = value1 + value2
 
         this.flagN = 0
@@ -66,30 +66,30 @@ export default abstract class Alu extends Registers {
 
         return int16(sum)
     }
-    sub (value: Byte): void {
-        this.flagZ = this.A === int8(value)
+    sub (value: Int8): void {
+        this.flagZ = int8(this.A) === value
         this.flagN = 1
         this.flagH = (this.A & 0x0F) < (value & 0x0F)
         this.flagC = this.A < int8(value)
         this.A -= value
     }
-    sbc (value: Byte): void {
+    sbc (value: Int8): void {
         const valueWithCarry = int8(value + this.flagC)
 
-        this.flagZ = this.A === valueWithCarry
+        this.flagZ = int8(this.A) === valueWithCarry
         this.flagN = 1
         this.flagH = (this.A & 0x0F) < (valueWithCarry & 0x0F)
         this.flagC = this.A < valueWithCarry
         this.A -= valueWithCarry
     }
-    dec (value: Byte): Byte {
+    dec (value: Int8): Int8 {
        this.flagN = 1
        this.flagZ = value === 0x01
        this.flagH = (value & 0x0F) === 0x00
 
        return int8(value - 1)
     }
-    inc (value: Byte): Byte {
+    inc (value: Int8): Int8 {
        this.flagN = 0
        this.flagZ = value === 0xFF
        this.flagH = (((value & 0xF) + 1) & 0x10) === 0x10
@@ -97,7 +97,7 @@ export default abstract class Alu extends Registers {
        return int8(value + 1)
     }
     /* ----- ROTATE OPERATIONS ------ */
-    rl (value: Byte): Byte {
+    rl (value: Uint8): Uint8 {
         const carryBit = value & 0x80
         const result = (value << 1) | this.flagC
 
@@ -106,7 +106,7 @@ export default abstract class Alu extends Registers {
         this.flagH = 0
         this.flagC = bit(carryBit)
 
-        return int8(result)
+        return uint8(result)
     }
     rla (): void {
         const carryBit = this.A & 0x80
@@ -117,7 +117,7 @@ export default abstract class Alu extends Registers {
         this.flagH = 0
         this.flagC = bit(carryBit)
     }
-    rlc (value: Byte): Byte {
+    rlc (value: Uint8): Uint8 {
         const carryBit = value & 0x80
         const result = (value << 1) | carryBit
 
@@ -126,7 +126,7 @@ export default abstract class Alu extends Registers {
         this.flagH = 0
         this.flagC = bit(carryBit)
 
-        return int8(result)
+        return uint8(result)
     }
     rlca (): void {
         const carryBit = this.A & 0x80
@@ -138,7 +138,7 @@ export default abstract class Alu extends Registers {
         this.flagH = 0
         this.flagC = bit(carryBit)
     }
-    rr (value: Byte): Byte {
+    rr (value: Uint8): Uint8 {
         const carryBit = value & 0x01
         let result = value >>> 1
 
@@ -148,7 +148,7 @@ export default abstract class Alu extends Registers {
         this.flagH = 0
         this.flagC = bit(carryBit)
 
-        return int8(result)
+        return uint8(result)
     }
     rra (): void {
         const carryBit = this.A & 0x01
@@ -160,7 +160,7 @@ export default abstract class Alu extends Registers {
         this.flagH = 0
         this.flagC = bit(carryBit)
     }
-    rrc (value: Byte): Byte {
+    rrc (value: Uint8): Uint8 {
         const carryBit = value & 0x01
         let result = value >> 1
         
@@ -170,7 +170,7 @@ export default abstract class Alu extends Registers {
         this.flagH = 0
         this.flagC = bit(carryBit)
 
-        return int8(result)
+        return uint8(result)
     }
     rrca (): void {
         const carryBit = this.A & 0x01
@@ -182,7 +182,7 @@ export default abstract class Alu extends Registers {
         this.flagH = 0
         this.flagC = bit(carryBit)
     }
-    sla (value: Byte): Byte {
+    sla (value: Uint8): Uint8 {
         const carryBit = value & 0x80
         const result = value << 1
 
@@ -191,9 +191,9 @@ export default abstract class Alu extends Registers {
         this.flagH = 0
         this.flagC = bit(carryBit)
 
-        return int8(result)
+        return uint8(result)
     }
-    sra (value: Byte): Byte {
+    sra (value: Uint8): Uint8 {
         const signBit = value & 0x80
         const carryBit = value & 0x01
         let result = (value & 0x7F) >> 1
@@ -204,9 +204,9 @@ export default abstract class Alu extends Registers {
         this.flagH = 0
         this.flagC = bit(carryBit)
 
-        return int8(result)
+        return uint8(result)
     }
-    srl (value: Byte): Byte {
+    srl (value: Uint8): Uint8 {
         const carryBit = value & 0x01
         const result = (value >> 1) & 0x7F // reseting bit7 due to JS shift being > 8bit
         
@@ -215,9 +215,9 @@ export default abstract class Alu extends Registers {
         this.flagH = 0
         this.flagC = bit(carryBit)
 
-        return int8(result)
+        return uint8(result)
     }
-    swap (value: Byte): Byte {
+    swap (value: Uint8): Uint8 {
         const hNibble = (value & 0xF0) >> 4
         const result = (value << 4) | hNibble
 
@@ -226,43 +226,43 @@ export default abstract class Alu extends Registers {
         this.flagH = 0
         this.flagC = 0
 
-        return int8(result)
+        return uint8(result)
     }
     /* ----- BIT OPERATIONS ----- */
-    bit (bit: BitPosition, value: Byte): void {
+    bit (bit: BitPosition, value: Uint8): void {
         this.flagZ = (value & (1 << bit)) ? 0 : 1
         this.flagN = 0
         this.flagH = 1
     }
-    set (bit: BitPosition, value: Byte): Byte {
+    set (bit: BitPosition, value: Uint8): Uint8 {
        const result = value | (1 << bit)
 
-       return int8(result)
+       return uint8(result)
     }
-    res (bit: BitPosition, value: Byte): Byte {
+    res (bit: BitPosition, value: Uint8): Uint8 {
         const result = value & ~(1 << bit)
 
-        return int8(result)
+        return uint8(result)
     }
     /* ----- STACK OPERATIONS -----*/
-    push (value: Word): void {
-        this.mem.store16(value, this.SP)
+    push (value: Uint16): void {
         this.SP -= 2
+        this.mem.store16(value, this.SP)
     }
-    pop (): Word {
+    pop (): Uint16 {
         const value = this.mem.load16(this.SP)
         this.SP += 2
 
         return value
     }
     /* ----- CODE FLOW OPERATIONS ----- */
-    call (address: Word): void {
-        this.mem.store16(this.PC, this.SP)
+    call (address: Uint16): void {
         this.SP -= 2
+        this.mem.store16(this.PC, this.SP)
         this.PC = address
     }
     ret (): void {
-        this.SP += 2
         this.PC = this.mem.load16(this.SP)
+        this.SP += 2
     }
 }

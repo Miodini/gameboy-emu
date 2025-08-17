@@ -3,7 +3,7 @@ import BgPpu from "./bgPpu"
 import ObjectPpu from "./objectPpu"
 import { Addresses, Colors, Sizes } from "./constants"
 import { pkmnVramDump, pkmnOamDump } from '../../mock/mocks'
-import { getBit, int8, uint16 } from "../utils"
+import { getBit, uint8, uint16 } from "../utils"
 
 export default class Ppu {
   private readonly mem: Memory
@@ -71,20 +71,20 @@ export default class Ppu {
 
     this.mem.LY++
     if (this.mem.LY > Sizes.SCREEN_HEIGHT) {
-      this.mem.LY = int8(0)
+      this.mem.LY = uint8(0)
     }
   }
 
   public _test = () => {
-    this.mem.SCX = int8(0)
-    this.mem.SCY = int8(0)
-    this.mem.LCDC = int8(0xeb)
+    this.mem.SCX = uint8(0)
+    this.mem.SCY = uint8(0)
+    this.mem.LCDC = uint8(0xeb)
 
     pkmnVramDump.forEach((byte, index) => {
-      this.mem.store8(int8(byte), uint16(Addresses.VRAM + index))
+      this.mem.store8(uint8(byte), uint16(Addresses.VRAM + index))
     })
     pkmnOamDump.forEach((byte, index) => {
-      this.mem.store8(int8(byte), uint16(Addresses.OAM + index))
+      this.mem.store8(uint8(byte), uint16(Addresses.OAM + index))
     })
 
     this.draw()

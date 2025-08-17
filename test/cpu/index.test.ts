@@ -1,15 +1,18 @@
-import type { Bit, Byte, Word } from '../../src/types.js'
-import Cpu from '../../src/cpu'
-import { int8, int16, uint16 } from '../../src/utils.js'
+/** Important: when testing registers, make sure to cast the `toBe` argument to the same data type (signed vs unsigned) */
 import { jest, describe, expect, test, beforeEach } from '@jest/globals'
+import Cpu from '../../src/cpu'
+import Memory from '../../src/memory'
+import { int8, uint8, int16, uint16 } from '../../src/utils.js'
+import type { Bit, Uint8, Uint16 } from '../../src/types.js'
 jest.mock('../../src/cpu')
 
-const cpu = new Cpu()
+const mem = new Memory()
+const cpu = new Cpu(mem)
 
-function getRegisterValue(register: string): Byte | Word | null {
+function getRegisterValue(register: string): Uint8 | Uint16 | null {
     return (cpu as any)[register] ?? null
 }
-function setRegisterValue(register: string, value: Byte | Word) {
+function setRegisterValue(register: string, value: Uint8 | Uint16) {
     if (typeof (cpu as any)[register] !== 'undefined') {
         (cpu as any)[register] = value   
     }
@@ -53,7 +56,7 @@ beforeEach(() => {
 
 describe('Instructions', () => {
     // Conmmon constants to be tested for many instructions
-    const value = int8(100), aux = int8(20), address = uint16(0x100), auxAddress = uint16(0x200)
+    const value = uint8(100), aux = uint8(20), address = uint16(0x100), auxAddress = uint16(0x200)
 
     test.each([
         0x03, 0x04, 0x0C, 0x13, 0x14, 0x1C, 0x23, 0x24, 0x2C, 0x33, 0x3C
@@ -62,7 +65,7 @@ describe('Instructions', () => {
 
         setRegisterValue(register, value)
         instruction.fn()
-        expect(getRegisterValue(register)).toBe(value + 1)
+        expect(getRegisterValue(register)).toBe(uint8(value + 1))
     })
     test.each([
         0x05, 0x0B, 0x0D, 0x15, 0x1B, 0x1D, 0x25, 0x2B, 0x2D, 0x3B, 0x3D
@@ -71,7 +74,7 @@ describe('Instructions', () => {
 
         setRegisterValue(register, value)
         instruction.fn()
-        expect(getRegisterValue(register)).toBe(value - 1)
+        expect(getRegisterValue(register)).toBe(uint8(value - 1))
     })
     test.each([
         0x01, 0x11, 0x21, 0x31
@@ -79,7 +82,7 @@ describe('Instructions', () => {
         const { instruction, registers: [ register ] } = getRegistersFromOpCode(opCode, /LD (\w+),d16$/, )
 
         instruction.fn(address)
-        expect(getRegisterValue(register)).toBe(address)
+        expect(getRegisterValue(register)).toBe(uint16(address))
     })
     test.each([
         0x02, 0x12, 0x77, 
@@ -89,7 +92,7 @@ describe('Instructions', () => {
         cpu.A = value
         setRegisterValue(register, address)
         instruction.fn()
-        expect(cpu.mem.load8(address)).toBe(value)
+        expect(cpu.mem.load8(address)).toBe(uint8(value))
     })
     test.each([
         0x06, 0x0E, 0x16, 0x1E, 0x26, 0x2E, 0x3E
@@ -97,7 +100,7 @@ describe('Instructions', () => {
         const { instruction, registers: [ register ] } = getRegistersFromOpCode(opCode, /LD (\w+),d8$/)
         
         instruction.fn(value)
-        expect(getRegisterValue(register)).toBe(value)
+        expect(getRegisterValue(register)).toBe(uint8(value))
     })
     test.each([
         0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x87
@@ -145,18 +148,18 @@ describe('Instructions', () => {
         cpu.mem.store8(value, address)
         setRegisterValue(reg2, address)
         instruction.fn()
-        expect(getRegisterValue(reg1)).toBe(value)
+        expect(getRegisterValue(reg1)).toBe(uint8(value))
     })
     test('NOP', () => expect(cpu.instructions[0x00].fn).not.toThrow())
     test('RLCA', () => {
         cpu.A = value
         cpu.instructions[0x07].fn()
-        expect(cpu.A).toBe(-56)
+        expect(cpu.A).toBe(uint8(-56))
     })
     test('LD (a16),SP', () => {
         cpu.SP = value
         cpu.instructions[0x08].fn(address)
-        expect(cpu.mem.load16(address)).toBe(value)
+        expect(cpu.mem.load16(address)).toBe(uint8(value))
     })    
     test('RRCA', () => {
         cpu.A = value
@@ -170,24 +173,24 @@ describe('Instructions', () => {
     test('RLA', () => {
         cpu.A = value
         cpu.instructions[0x17].fn()
-        expect(cpu.A).toBe(int8(200))
+        expect(cpu.A).toBe(uint8(200))
     })
     test('JR r8', () => {
         cpu.PC = address
         cpu.instructions[0x18].fn(value)
-        expect(cpu.PC).toBe(address + value)
+        expect(cpu.PC).toBe(uint16(address + value))
     })
     test('RRA', () => {
         cpu.A = value
         cpu.instructions[0x1F].fn()
-        expect(cpu.A).toBe(50)
+        expect(cpu.A).toBe(uint8(50))
     })
     test('LD (HL+),A', () => {
         cpu.HL = address
         cpu.A = value
         cpu.instructions[0x22].fn()
-        expect(cpu.mem.load8(int16(address + 1))).toBe(value)
-        expect(cpu.HL).toBe(address + 1)
+        expect(cpu.mem.load8(uint16(address + 1))).toBe(uint8(value))
+        expect(cpu.HL).toBe(uint16(address + 1))
     })
     test('DAA', () => {
         /* TODO: Write tests for the other flags */
@@ -207,26 +210,26 @@ describe('Instructions', () => {
         setFlag(flag, 1)
         cpu.PC = address
         instruction.fn(value)
-        expect(cpu.PC).toBe(address + value)
+        expect(cpu.PC).toBe(uint16(address + value))
         
         setFlag(flag, 0)
         cpu.PC = address
         instruction.fn(value)
-        expect(cpu.PC).toBe(address)
+        expect(cpu.PC).toBe(uint16(address))
     })
     test('LD A,(HL+)', () => {
         cpu.HL = address
         cpu.mem.store8(value, cpu.HL)
         cpu.instructions[0x2A].fn()
 
-        expect(cpu.A).toBe(value)
-        expect(cpu.HL).toBe(address + 1)
+        expect(cpu.A).toBe(uint8(value))
+        expect(cpu.HL).toBe(uint16(address + 1))
     })
     test('CPL', () => {
         cpu.A = value
         cpu.instructions[0x2F].fn()
 
-        expect(cpu.A).toBe(~value)
+        expect(cpu.A).toBe(uint8(~value))
     })
     test.each([
         [0x20, 0x30]
@@ -236,51 +239,51 @@ describe('Instructions', () => {
         setFlag(flag, 0)
         cpu.PC = address
         instruction.fn(value)
-        expect(cpu.PC).toBe(address + value)
+        expect(cpu.PC).toBe(uint16(address + value))
         
         setFlag(flag, 1)
         cpu.PC = address
         instruction.fn(value)
-        expect(cpu.PC).toBe(address)
+        expect(cpu.PC).toBe(uint16(address))
     })
     test('LD (HL-),A', () => {
         cpu.HL = address
         cpu.A = value
         cpu.instructions[0x32].fn()
 
-        expect(cpu.mem.load8(address)).toBe(value)
-        expect(cpu.HL).toBe(address -1 )
+        expect(cpu.mem.load8(address)).toBe(uint8(value))
+        expect(cpu.HL).toBe(uint16(address -1 ))
     })
     test('INC (HL)', () => {
         cpu.HL = address
         cpu.mem.store8(value, cpu.HL)
         cpu.instructions[0x34].fn()
 
-        expect(cpu.mem.load8(cpu.HL)).toBe(value + 1)
+        expect(cpu.mem.load8(cpu.HL)).toBe(uint8(value + 1))
     })
     test('DEC (HL)', () => {
         cpu.HL = address
         cpu.mem.store8(value, cpu.HL)
         cpu.instructions[0x35].fn()
 
-        expect(cpu.mem.load8(cpu.HL)).toBe(value - 1)
+        expect(cpu.mem.load8(cpu.HL)).toBe(uint8(value - 1))
     })
     test('LD (HL),d8', () => {
         cpu.HL = address
         cpu.instructions[0x36].fn(value)
 
-        expect(cpu.mem.load8(cpu.HL)).toBe(value)
+        expect(cpu.mem.load8(cpu.HL)).toBe(uint8(value))
     })
     test('SCF', () => {
         cpu.instructions[0x37].fn()
         expect(cpu.flagC).toBe(1)
     }),
     test('LD A,(HL-)', () => {
-        cpu.mem.store8(value, int16(address - 1))
+        cpu.mem.store8(value, uint16(address - 1))
         cpu.HL = address
         cpu.instructions[0x3A].fn()
-        expect(cpu.A).toBe(value)
-        expect(cpu.HL).toBe(address - 1)
+        expect(cpu.A).toBe(uint8(value))
+        expect(cpu.HL).toBe(uint16(address - 1))
     }),
     test('CCF', () => {
         cpu.flagC = 1
@@ -302,7 +305,7 @@ describe('Instructions', () => {
 
         setRegisterValue(reg1, value)
         instruction.fn()
-        expect(getRegisterValue(reg2)).toBe(value)
+        expect(getRegisterValue(reg2)).toBe(uint8(value))
     }),
     test.each([
         [0x46, 0x4E, 0x56, 0x5E, 0x66, 0x6E, 0x7E]
@@ -312,7 +315,7 @@ describe('Instructions', () => {
         cpu.HL = address
         cpu.mem.store8(value, address)
         instruction.fn()
-        expect(getRegisterValue(register)).toBe(value)
+        expect(getRegisterValue(register)).toBe(uint8(value))
     }),
     test.each([
         [0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x77]
@@ -322,7 +325,7 @@ describe('Instructions', () => {
         cpu.HL = address
         setRegisterValue(register, value)
         instruction.fn()
-        expect(cpu.mem.load8(address)).toBe(value)
+        expect(cpu.mem.load8(address)).toBe(uint8(value))
     }),
     test('HALT', () => {
         cpu.instructions[0x76].fn()
@@ -333,7 +336,7 @@ describe('Instructions', () => {
         cpu.HL = address
         cpu.mem.store8(aux, address)
         cpu.instructions[0x86].fn()
-        expect(cpu.A).toBe(value + aux)
+        expect(cpu.A).toBe(uint8(value + aux))
     })
     test.each([
         [0x88, 0x89, 0x8A, 0x8B, 0x8C, 0x8D, 0x8F]
@@ -347,7 +350,7 @@ describe('Instructions', () => {
         if (register === 'A') {
             expect(cpu.A).toBe(aux + aux + 1)
         } else {
-            expect(cpu.A).toBe(value + aux + 1)
+            expect(cpu.A).toBe(uint8(value + aux + 1))
         }
     })
     test('ADC A,(HL)', () => {
@@ -356,7 +359,7 @@ describe('Instructions', () => {
         cpu.HL = address
         cpu.mem.store8(aux, address)
         cpu.instructions[0x8E].fn()
-        expect(cpu.A).toBe(value + aux + 1)
+        expect(cpu.A).toBe(uint8(value + aux + 1))
     })
     test.each([
         [0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x97]
@@ -366,14 +369,14 @@ describe('Instructions', () => {
         cpu.A = value
         setRegisterValue(register, aux)
         instruction.fn()
-        expect(cpu.A).toBe(value - aux)
+        expect(cpu.A).toBe(uint8(value - aux))
     })
     test('SUB (HL)', () => {
         cpu.A = value
         cpu.HL = address
         cpu.mem.store8(aux, address)
         cpu.instructions[0x96].fn()
-        expect(cpu.A).toBe(value - aux)
+        expect(cpu.A).toBe(uint8(value - aux))
     })
     test.each([
         [0x98, 0x99, 0x9A, 0x9B, 0x9C, 0x9D, 0x9F]
@@ -384,7 +387,7 @@ describe('Instructions', () => {
         cpu.A = value
         setRegisterValue(register, aux)
         instruction.fn()
-        expect(cpu.A).toBe(value - aux - 1)
+        expect(cpu.A).toBe(uint8(value - aux - 1))
     })
     test('SBC A,(HL)', () => {
         cpu.flagC = 1
@@ -392,7 +395,7 @@ describe('Instructions', () => {
         cpu.HL = address
         cpu.mem.store8(aux, address)
         cpu.instructions[0x9E].fn()
-        expect(cpu.A).toBe(value - aux - 1)
+        expect(cpu.A).toBe(uint8(value - aux - 1))
     })
     test.each([
         [0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5, 0xA7]
@@ -402,14 +405,14 @@ describe('Instructions', () => {
         cpu.A = value
         setRegisterValue(register, aux)
         instruction.fn()
-        expect(cpu.A).toBe(value & aux)
+        expect(cpu.A).toBe(uint8(value & aux))
     })
     test('AND (HL)', () => {
         cpu.A = value
         cpu.HL = address
         cpu.mem.store8(aux, address)
         cpu.instructions[0xA6].fn()
-        expect(cpu.A).toBe(value & aux)
+        expect(cpu.A).toBe(uint8(value & aux))
     })
     test.each([
         [0xA8, 0xA9, 0xAA, 0xAB, 0xAC, 0xAD, 0xAF]
@@ -419,14 +422,14 @@ describe('Instructions', () => {
         cpu.A = value
         setRegisterValue(register, aux)
         instruction.fn()
-        expect(cpu.A).toBe(value ^ aux)
+        expect(cpu.A).toBe(uint8(value ^ aux))
     })
     test('XOR (HL)', () => {
         cpu.A = value
         cpu.HL = address
         cpu.mem.store8(aux, address)
         cpu.instructions[0xAE].fn()
-        expect(cpu.A).toBe(value ^ aux)
+        expect(cpu.A).toBe(uint8(value ^ aux))
     })
     test.each([
         [0xB0, 0xB1, 0xB2, 0xB3, 0xB4, 0xB5, 0xB7]
@@ -436,14 +439,14 @@ describe('Instructions', () => {
         cpu.A = value
         setRegisterValue(register, aux)
         instruction.fn()
-        expect(cpu.A).toBe(value | aux)
+        expect(cpu.A).toBe(uint8(value | aux))
     })
     test('OR (HL)', () => {
         cpu.A = value
         cpu.HL = address
         cpu.mem.store8(aux, address)
         cpu.instructions[0xB6].fn()
-        expect(cpu.A).toBe(value | aux)
+        expect(cpu.A).toBe(uint8(value | aux))
     })
     test.each([
         [0xB8, 0xB9, 0xBA, 0xBB, 0xBC, 0xBD, 0xBF]
@@ -489,12 +492,12 @@ describe('Instructions', () => {
 
         setFlag(flag, flagStatus)
         cpu.PC = 0
-        cpu.SP = address - 2
+        cpu.SP = address
         cpu.mem.store16(auxAddress, address)
         instruction.fn()
         if ((getFlag(flag) && !isNegative) || (!getFlag(flag) && isNegative)) {
-            expect(cpu.PC).toBe(auxAddress)
-            expect(cpu.SP).toBe(address)
+            expect(cpu.PC).toBe(uint16(auxAddress))
+            expect(cpu.SP).toBe(uint16(address + 2))
         } else {
             expect(cpu.PC).toBe(0)
         }
@@ -505,9 +508,9 @@ describe('Instructions', () => {
         const { instruction, registers: [ register ] } = getRegistersFromOpCode(opCode, /POP (\w+)$/)
 
         cpu.SP = address
-        cpu.mem.store16(int16(value), address)
+        cpu.mem.store16(uint16(value), address)
         instruction.fn()
-        expect(getRegisterValue(register)).toBe(value)       
+        expect(getRegisterValue(register)).toBe(uint8(value)       )
     })
     test.each([
         [0xC2, true], [0xCA, true], [0xD2, true], [0xDA, true],
@@ -520,14 +523,14 @@ describe('Instructions', () => {
         cpu.PC = 0
         instruction.fn(address)
         if ((getFlag(flag) && !isNegative) || (!getFlag(flag) && isNegative)) {
-            expect(cpu.PC).toBe(address)
+            expect(cpu.PC).toBe(uint16(address))
         } else {
             expect(cpu.PC).toBe(0)
         }
     })
     test('JP a16', () => {
         cpu.instructions[0xC3].fn(address)
-        expect(cpu.PC).toBe(address)
+        expect(cpu.PC).toBe(uint16(address))
     })
     test.each([
         [0xC4, true], [0xCC, true], [0xD4, true], [0xDC, true],
@@ -543,7 +546,7 @@ describe('Instructions', () => {
         instruction.fn(functionAddress)
         if ((getFlag(flag) && !isNegative) || (!getFlag(flag) && isNegative)) {
             expect(cpu.PC).toBe(functionAddress)
-            expect(cpu.mem.load16(int16(stackPointer))).toBe(initialAddress)
+            expect(cpu.mem.load16(cpu.SP)).toBe(initialAddress)
             expect(cpu.SP).toBe(stackPointer - 2)
         } else {
             expect(cpu.PC).toBe(initialAddress)
@@ -557,8 +560,8 @@ describe('Instructions', () => {
         cpu.SP = address
         setRegisterValue(register, value)
         instruction.fn()
-        expect(cpu.mem.load16(address)).toBe(value)
-        expect(cpu.SP).toBe(address - 2)
+        expect(cpu.mem.load16(address)).toBe(uint8(value))
+        expect(cpu.SP).toBe(uint16(address - 2))
     })
     test.each([
         [0xC7, 0xCF, 0xD7, 0xDF, 0xE7, 0xEF, 0xF7, 0xFF]
@@ -574,15 +577,16 @@ describe('Instructions', () => {
         cpu.PC = address
         cpu.SP = auxAddress
         instruction.fn()
-        expect(cpu.mem.load16(auxAddress)).toBe(address)
+        expect(cpu.mem.load16(auxAddress)).toBe(uint16(address))
         expect(cpu.PC).toBe(parsedAddress)
     })
     test('RET', () => {
         cpu.PC = 0
-        cpu.SP = address - 2
-        cpu.mem.store16(auxAddress, address)
+        cpu.SP = address
+        cpu.mem.store16(auxAddress, cpu.SP)
         cpu.instructions[0xC9].fn()
-        expect(cpu.PC).toBe(auxAddress)
+        expect(cpu.PC).toBe(uint16(auxAddress))
+        expect(cpu.SP).toBe(uint16(address + 2))
     })
     test('PREFIX', () => {
         const spy = jest.spyOn(cpu.instructions[0xCB00 | value], 'fn')

@@ -8,6 +8,14 @@ const PIXEL_SIZE = 5
 const worker = new Worker(new URL('./workers', import.meta.url))
 
 const initializeHtml = () => {
+  const pauseButton = document.getElementById('pause') as HTMLButtonElement
+
+  pauseButton.addEventListener('click', () => {
+    worker.postMessage({
+      messageType: WT.MessageType.Pause
+    })
+  })
+
   canvas.width = Sizes.VISIBLE_SCREEN_WIDTH * PIXEL_SIZE
   canvas.height = Sizes.VISIBLE_SCREEN_HEIGHT * PIXEL_SIZE
   
@@ -24,7 +32,7 @@ fileInput.addEventListener('change', () => {
     
     reader.onload = () => {
       if (reader.result instanceof ArrayBuffer) {
-        const fileContent = new Int8Array(reader.result)
+        const fileContent = new Uint8Array(reader.result)
         const offscreenCanvas = canvas.transferControlToOffscreen()
         const messagePayload: WT.LoadMessagePayload = {
           romData: fileContent,

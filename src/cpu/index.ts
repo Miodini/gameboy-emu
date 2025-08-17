@@ -1,6 +1,6 @@
-import type { Byte, Word, Instruction } from '../types'
+import type { Uint8, Uint16, Instruction } from '../types'
 import Alu from "./alu"
-import { int8, uint8, int16 } from '../utils'
+import { int8, uint8, int16, uint16 } from '../utils'
 
 export default class Cpu extends Alu {
     stopFlag = false // Not related to the hardware. Tells whether the emulator should stop executing code
@@ -22,7 +22,7 @@ export default class Cpu extends Alu {
             name: 'LD BC,d16',
             args: 2,
             cycles: 12,
-            fn: (word: Word) => this.BC = word
+            fn: (word: Uint16) => this.BC = word
         },
         0x02: {
             name: 'LD (BC),A',
@@ -40,19 +40,19 @@ export default class Cpu extends Alu {
             name: 'INC B',
             args: 0,
             cycles: 4,
-            fn: () => this.B = this.inc(this.B)
+            fn: () => this.B = this.inc(int8(this.B))
         },
         0x05: {
             name: 'DEC B',
             args: 0,
             cycles: 4,
-            fn: () => this.B = this.dec(this.B)
+            fn: () => this.B = this.dec(int8(this.B))
         },
         0x06: {
             name: 'LD B,d8',
             args: 1,
             cycles: 8,
-            fn: (byte: Byte) => this.B = byte 
+            fn: (byte: Uint8) => this.B = byte 
         },
         0x07: {
             name: 'RLCA',
@@ -64,13 +64,13 @@ export default class Cpu extends Alu {
             name: 'LD (a16),SP',
             args: 2,
             cycles: 20,
-            fn: (word: Word) => this.mem.store16(this.SP, word)
+            fn: (word: Uint16) => this.mem.store16(this.SP, word)
         },
         0x09: {
             name: 'ADD HL,BC',
             args: 0,
             cycles: 8,
-            fn: () => this.HL = this.add16(this.HL, this.BC)
+            fn: () => this.HL = this.add16(int16(this.HL), int16(this.BC))
         },
         0x0A: {
             name: 'LD A,(BC)',
@@ -88,19 +88,19 @@ export default class Cpu extends Alu {
             name: 'INC C',
             args: 0,
             cycles: 4,
-            fn: () => this.C = this.inc(this.C)
+            fn: () => this.C = this.inc(int8(this.C))
         },
         0x0D: {
             name: 'DEC C',
             args: 0,
             cycles: 4,
-            fn: () => this.C = this.dec(this.C)
+            fn: () => this.C = this.dec(int8(this.C))
         },
         0x0E: {
             name: 'LD C,d8',
             args: 1,
             cycles: 8,
-            fn: (byte: Byte) => this.C = byte 
+            fn: (byte: Uint8) => this.C = byte 
         },
         0x0F: {
             name: 'RRCA',
@@ -119,7 +119,7 @@ export default class Cpu extends Alu {
             name: 'LD DE,d16',
             args: 2,
             cycles: 12,
-            fn: (word: Word) => this.DE = word
+            fn: (word: Uint16) => this.DE = word
         },
         0x12: {
             name: 'LD (DE),A',
@@ -137,19 +137,19 @@ export default class Cpu extends Alu {
             name: 'INC D',
             args: 0,
             cycles: 4,
-            fn: () => this.D = this.inc(this.D)
+            fn: () => this.D = this.inc(int8(this.D))
         },
         0x15: {
             name: 'DEC D',
             args: 0,
             cycles: 4,
-            fn: () => this.D = this.dec(this.D)
+            fn: () => this.D = this.dec(int8(this.D))
         },
         0x16: {
             name: 'LD D,d8',
             args: 1,
             cycles: 8,
-            fn: (byte: Byte) => this.D = byte 
+            fn: (byte: Uint8) => this.D = byte 
         },
         0x17: {
             name: 'RLA',
@@ -161,14 +161,14 @@ export default class Cpu extends Alu {
             name: 'JR r8',
             args: 1,
             cycles: 12,
-            fn: (byte: Byte) => this.PC += byte
+            fn: (byte: Uint8) => this.PC += byte
         },
         0x19: {
             name: 'ADD HL,DE',
             args: 0,
             cycles: 8,
             fn: () => {
-                this.HL = this.add16(this.HL, this.DE)
+                this.HL = this.add16(int16(this.HL), int16(this.DE))
             }
         },
         0x1A: {
@@ -187,19 +187,19 @@ export default class Cpu extends Alu {
             name: 'INC E',
             args: 0,
             cycles: 4,
-            fn: () => this.E = this.inc(this.E)
+            fn: () => this.E = this.inc(int8(this.E))
         },
         0x1D: {
             name: 'DEC E',
             args: 0,
             cycles: 4,
-            fn: () => this.E = this.dec(this.E)
+            fn: () => this.E = this.dec(int8(this.E))
         },
         0x1E: {
             name: 'LD E,d8',
             args: 1,
             cycles: 8,
-            fn: (byte: Byte) => this.E = byte 
+            fn: (byte: Uint8) => this.E = byte 
         },
         0x1F: {
             name: 'RRA',
@@ -209,9 +209,9 @@ export default class Cpu extends Alu {
         },
         0x20: {
             name: 'JR NZ,r8',
-            args: 2,
+            args: 1,
             cycles: 8,
-            fn: (byte: Byte) => {
+            fn: (byte: Uint8) => {
                 if (!this.flagZ) {
                     this.PC += byte
                     this.instructions[0x20].cycles = 12
@@ -224,7 +224,7 @@ export default class Cpu extends Alu {
             name: 'LD HL,d16',
             args: 2,
             cycles: 12,
-            fn: (word: Word) => this.HL = word
+            fn: (word: Uint16) => this.HL = word
         },
         0x22: {
             name: 'LD (HL+),A',
@@ -245,19 +245,19 @@ export default class Cpu extends Alu {
             name: 'INC H',
             args: 0,
             cycles: 4,
-            fn: () => this.H = this.inc(this.H)
+            fn: () => this.H = this.inc(int8(this.H))
         },
         0x25: {
             name: 'DEC H',
             args: 0,
             cycles: 4,
-            fn: () => this.H = this.dec(this.H)
+            fn: () => this.H = this.dec(int8(this.H))
         },
         0x26: {
             name: 'LD H,d8',
             args: 1,
             cycles: 8,
-            fn: (byte: Byte) => this.H = byte 
+            fn: (byte: Uint8) => this.H = byte 
         },
         0x27: {
             // Intended to be run after a BCD arithmetic instruction
@@ -265,77 +265,6 @@ export default class Cpu extends Alu {
             args: 0,
             cycles: 4,
             fn: () => {
-                // const highNibble = this.A & 0xF0
-                // const lowNibble = this.A & 0x0F
-                // if (this.flagC) {
-                //     if (this.flagH) {
-                //         // C, H
-                //         if (
-                //             (
-                //                 0 <= highNibble && highNibble <= 3 &&
-                //                 0 <= lowNibble && lowNibble <= 3
-                //             ) || (
-                //                 6 <= highNibble && highNibble <= 7 &&
-                //                 6 <= lowNibble && lowNibble <= 0x0F
-                //             )
-                //         ) {
-                //             this.A += 0x66
-                //         }
-                //     } else {
-                //         // C, !H
-                //         if (0 <= highNibble && highNibble <= 2 &&
-                //             0 <= lowNibble && lowNibble <= 9    
-                //         ) {
-                //             this.A += 0x60
-                //         } else if (0 <= highNibble && highNibble <= 2 &&
-                //             0xA <= lowNibble && lowNibble <= 0xF
-                //         ) {
-                //             this.A += 0x66
-                //         } else if (7 <= highNibble && highNibble <= 0xF &&
-                //             0 <= lowNibble <= 9
-                //         ) {
-                //             this.A += 0xA0
-                //         }
-                //     }
-                // } else {
-                //     if (this.flagH) {
-                //         // !C, H
-                //         if (0 <= highNibble && highNibble <= 9 &&
-                //             0 <= lowNibble && lowNibble <= 3
-                //         ) {
-                //             this.A += 0x06
-                //         } else if (0xA <= highNibble && highNibble <= 0xF &&
-                //             0 <= lowNibble && lowNibble <= 3
-                //         ) {
-                //             this.A += 0x66
-                //             this.flagC = 1
-                //         } else if (0 <= highNibble && highNibble <= 8 &&
-                //             6 <= lowNibble && lowNibble <= 0xF    
-                //         ) {
-                //             this.A += 0xFA
-                //         }
-                //     } else {
-                //         // !C, !H
-                //         if (0 <= highNibble && highNibble <= 8 &&
-                //             0xA <= lowNibble && lowNibble <= 0xF
-                //         ) {
-                //             this.A += 0x06
-                //         } else if (0xA <= highNibble && highNibble <= 0xF &&
-                //             0 <= lowNibble && lowNibble <= 9
-                //         ) {
-                //             this.A += 0x60
-                //             this.flagC = 1
-                //         } else if (9 <= highNibble && highNibble <= 0xF &&
-                //             0xA <= lowNibble && lowNibble <= 0xF
-                //         ) {
-                //             this.A += 0x66
-                //             this.flagC = 1
-                //         }
-                //     }
-                // }
-                // this.flagZ = this.A === 0
-                // // TODO: H flag???
-
                 if (!this.flagN) {
                     // Adjust for addition
                     if (this.flagH || (this.A & 0x0F) > 0x09) {
@@ -362,7 +291,7 @@ export default class Cpu extends Alu {
             name: 'JR Z,r8',
             args: 1,
             cycles: 8,
-            fn: (byte: Byte) => {
+            fn: (byte: Uint8) => {
                 if (this.flagZ) {
                     this.PC += byte
                     this.instructions[0x28].cycles = 12
@@ -375,7 +304,7 @@ export default class Cpu extends Alu {
             name: 'ADD HL,HL',
             args: 0,
             cycles: 8,
-            fn: () => this.HL = this.add16(this.HL, this.HL)
+            fn: () => this.HL = this.add16(int16(this.HL), int16(this.HL))
         },
         0x2A: {
             name: 'LD A,(HL+)',
@@ -396,19 +325,19 @@ export default class Cpu extends Alu {
             name: 'INC L',
             args: 0,
             cycles: 4,
-            fn: () => this.L = this.inc(this.L)
+            fn: () => this.L = this.inc(int8(this.L))
         },
         0x2D: {
             name: 'DEC L',
             args: 0,
             cycles: 4,
-            fn: () => this.L = this.dec(this.L)
+            fn: () => this.L = this.dec(int8(this.L))
         },
         0x2E: {
             name: 'LD L,d8',
             args: 1,
             cycles: 8,
-            fn: (byte: Byte) => this.L = byte 
+            fn: (byte: Uint8) => this.L = byte 
         },
         0x2F : {
             name: 'CPL',
@@ -424,7 +353,7 @@ export default class Cpu extends Alu {
             name: 'JR NC,r8',
             args: 1,
             cycles: 8,
-            fn: (byte: Byte) => {
+            fn: (byte: Uint8) => {
                 if (!this.flagC) {
                     this.PC += byte
                     this.instructions[0x30].cycles = 12
@@ -437,7 +366,7 @@ export default class Cpu extends Alu {
             name: 'LD SP,d16',
             args: 2,
             cycles: 12,
-            fn: (word: Word) => this.SP = word
+            fn: (word: Uint16) => this.SP = word
         },
         0x32: {
             name: 'LD (HL-),A',
@@ -463,7 +392,7 @@ export default class Cpu extends Alu {
                 this.flagZ = value === 0xFF
                 this.flagH = (value & 0x0F) === 0x0F
                 this.flagN = 0
-                this.mem.store8(int8(value + 1), this.HL)
+                this.mem.store8(uint8(value + 1), this.HL)
             }
         },
         0x35: {
@@ -475,14 +404,14 @@ export default class Cpu extends Alu {
                 this.flagZ = value === 0x01
                 this.flagH = (value & 0x0F) === 0
                 this.flagN = 1
-                this.mem.store8(int8(value - 1), this.HL)
+                this.mem.store8(uint8(value - 1), this.HL)
             }
         },
         0x36: {
             name: 'LD (HL),d8',
             args: 1,
             cycles: 12,
-            fn: (byte: Byte) => this.mem.store8(byte, this.HL)
+            fn: (byte: Uint8) => this.mem.store8(byte, this.HL)
         },
         0x37: {
             name: 'SCF',
@@ -498,7 +427,7 @@ export default class Cpu extends Alu {
             name: 'JR C,r8',
             args: 1,
             cycles: 8,
-            fn: (byte: Byte) => {
+            fn: (byte: Uint8) => {
                 if (this.flagC) {
                     this.PC += byte
                     this.instructions[0x38].cycles = 12
@@ -512,7 +441,7 @@ export default class Cpu extends Alu {
             args: 0,
             cycles: 8,
             fn: () => {
-                this.HL = this.add16(this.HL, this.SP)
+                this.HL = this.add16(int16(this.HL), int16(this.SP))
             }
         },
         0x3A: {
@@ -535,7 +464,7 @@ export default class Cpu extends Alu {
             args: 0,
             cycles: 4,
             fn: () => {
-                this.A = this.inc(this.A)
+                this.A = this.inc(int8(this.A))
             }
         },
         0x3D: {
@@ -543,14 +472,14 @@ export default class Cpu extends Alu {
             args: 0,
             cycles: 4,
             fn: () => {
-                this.A = this.dec(this.A)
+                this.A = this.dec(int8(this.A))
             }
         },
         0x3E: {
             name: 'LD A,d8',
             args: 1,
             cycles: 8,
-            fn: (byte: Byte) => this.A = byte 
+            fn: (byte: Uint8) => this.A = byte 
         },
         0x3F: {
             name: 'CCF',
@@ -950,193 +879,193 @@ export default class Cpu extends Alu {
             name: 'ADD A,B',
             args: 0,
             cycles: 4,
-            fn: () => this.add8(this.A, this.B)
+            fn: () => this.add8(int8(this.A), int8(this.B))
         },
         0X81: {
             name: 'ADD A,C',
             args: 0,
             cycles: 4,
-            fn: () => this.add8(this.A, this.C)
+            fn: () => this.add8(int8(this.A), int8(this.C))
         },
         0X82: {
             name: 'ADD A,D',
             args: 0,
             cycles: 4,
-            fn: () => this.add8(this.A, this.D)
+            fn: () => this.add8(int8(this.A), int8(this.D))
         },
         0X83: {
             name: 'ADD A,E',
             args: 0,
             cycles: 4,
-            fn: () => this.add8(this.A, this.E)
+            fn: () => this.add8(int8(this.A), int8(this.E))
         },
         0X84: {
             name: 'ADD A,H',
             args: 0,
             cycles: 4,
-            fn: () => this.add8(this.A, this.H)
+            fn: () => this.add8(int8(this.A), int8(this.H))
         },
         0X85: {
             name: 'ADD A,L',
             args: 0,
             cycles: 4,
-            fn: () => this.add8(this.A, this.L)
+            fn: () => this.add8(int8(this.A), int8(this.L))
         },
         0X86: {
             name: 'ADD A,(HL)',
             args: 0,
             cycles: 8,
-            fn: () => this.add8(this.A, this.mem.load8(this.HL))
+            fn: () => this.add8(int8(this.A), int8(this.mem.load8(this.HL)))
         },
         0X87: {
             name: 'ADD A,A',
             args: 0,
             cycles: 4,
-            fn: () => this.add8(this.A, this.A)
+            fn: () => this.add8(int8(this.A), int8(this.A))
         },
         0X88: {
             name: 'ADC A,B',
             args: 0,
             cycles: 4,
-            fn: () => this.adc(this.A, this.B)
+            fn: () => this.adc(int8(this.A), int8(this.B))
         },
         0X89: {
             name: 'ADC A,C',
             args: 0,
             cycles: 4,
-            fn: () => this.adc(this.A, this.C)
+            fn: () => this.adc(int8(this.A), int8(this.C))
         },
         0X8A: {
             name: 'ADC A,D',
             args: 0,
             cycles: 4,
-            fn: () => this.adc(this.A, this.D)
+            fn: () => this.adc(int8(this.A), int8(this.D))
         },
         0X8B: {
             name: 'ADC A,E',
             args: 0,
             cycles: 4,
-            fn: () => this.adc(this.A, this.E)
+            fn: () => this.adc(int8(this.A), int8(this.E))
         },
         0X8C: {
             name: 'ADC A,H',
             args: 0,
             cycles: 4,
-            fn: () => this.adc(this.A, this.H)
+            fn: () => this.adc(int8(this.A), int8(this.H))
         },
         0X8D: {
             name: 'ADC A,L',
             args: 0,
             cycles: 4,
-            fn: () => this.adc(this.A, this.L)
+            fn: () => this.adc(int8(this.A), int8(this.L))
         },
         0X8E: {
             name: 'ADC A,(HL)',
             args: 0,
             cycles: 8,
-            fn: () => this.adc(this.A, this.mem.load8(this.HL))
+            fn: () => this.adc(int8(this.A), int8(this.mem.load8(this.HL)))
         },
         0X8F: {
             name: 'ADC A,A',
             args: 0,
             cycles: 4,
-            fn: () => this.adc(this.A, this.A)
+            fn: () => this.adc(int8(this.A), int8(this.A))
         },
         0x90: {
             name: 'SUB B',
             args: 0,
             cycles: 4,
-            fn: () => this.sub(this.B)
+            fn: () => this.sub(int8(this.B))
         },
         0x91: {
             name: 'SUB C',
             args: 0,
             cycles: 4,
-            fn: () => this.sub(this.C)
+            fn: () => this.sub(int8(this.C))
         },
         0x92: {
             name: 'SUB D',
             args: 0,
             cycles: 4,
-            fn: () => this.sub(this.D)
+            fn: () => this.sub(int8(this.D))
         },
         0x93: {
             name: 'SUB E',
             args: 0,
             cycles: 4,
-            fn: () => this.sub(this.E)
+            fn: () => this.sub(int8(this.E))
         },
         0x94: {
             name: 'SUB H',
             args: 0,
             cycles: 4,
-            fn: () => this.sub(this.H)
+            fn: () => this.sub(int8(this.H))
         },
         0x95: {
             name: 'SUB L',
             args: 0,
             cycles: 4,
-            fn: () => this.sub(this.L)
+            fn: () => this.sub(int8(this.L))
         },
         0x96: {
             name: 'SUB (HL)',
             args: 0,
             cycles: 8,
-            fn: () => this.sub(this.mem.load8(this.HL))
+            fn: () => this.sub(int8(this.mem.load8(this.HL)))
         },
         0x97: {
             name: 'SUB A,A',
             args: 0,
             cycles: 4,
-            fn: () => this.sub(this.A)
+            fn: () => this.sub(int8(this.A))
         },
         0x98: {
             name: 'SBC A,B',
             args: 0,
             cycles: 4,
-            fn: () => this.sbc(this.B)
+            fn: () => this.sbc(int8(this.B))
         },
         0x99: {
             name: 'SBC A,C',
             args: 0,
             cycles: 4,
-            fn: () => this.sbc(this.C)
+            fn: () => this.sbc(int8(this.C))
         },
         0x9A: {
             name: 'SBC A,D',
             args: 0,
             cycles: 4,
-            fn: () => this.sbc(this.D)
+            fn: () => this.sbc(int8(this.D))
         },
         0x9B: {
             name: 'SBC A,E',
             args: 0,
             cycles: 4,
-            fn: () => this.sbc(this.E)
+            fn: () => this.sbc(int8(this.E))
         },
         0x9C: {
             name: 'SBC A,H',
             args: 0,
             cycles: 4,
-            fn: () => this.sbc(this.H)
+            fn: () => this.sbc(int8(this.H))
         },
         0x9D: {
             name: 'SBC A,L',
             args: 0,
             cycles: 4,
-            fn: () => this.sbc(this.L)
+            fn: () => this.sbc(int8(this.L))
         },
         0x9E: {
             name: 'SBC A,(HL)',
             args: 0,
             cycles: 8,
-            fn: () => this.sbc(this.mem.load8(this.HL))
+            fn: () => this.sbc(int8(this.mem.load8(this.HL)))
         },
         0x9F: {
             name: 'SBC A,A',
             args: 0,
             cycles: 4,
-            fn: () => this.sbc(this.A)
+            fn: () => this.sbc(int8(this.A))
         },
         0xA0: {
             name: 'AND B',
@@ -1286,49 +1215,49 @@ export default class Cpu extends Alu {
             name: 'CP B',
             args: 0,
             cycles: 4,
-            fn: () => this.cp(this.B)
+            fn: () => this.cp(int8(this.B))
         },
         0xB9: {
             name: 'CP C',
             args: 0,
             cycles: 4,
-            fn: () => this.cp(this.C)
+            fn: () => this.cp(int8(this.C))
         },
         0xBA: {
             name: 'CP D',
             args: 0,
             cycles: 4,
-            fn: () => this.cp(this.D)
+            fn: () => this.cp(int8(this.D))
         },
         0xBB: {
             name: 'CP E',
             args: 0,
             cycles: 4,
-            fn: () => this.cp(this.E)
+            fn: () => this.cp(int8(this.E))
         },
         0xBC: {
             name: 'CP H',
             args: 0,
             cycles: 4,
-            fn: () => this.cp(this.H)
+            fn: () => this.cp(int8(this.H))
         },
         0xBD: {
             name: 'CP L',
             args: 0,
             cycles: 4,
-            fn: () => this.cp(this.L)
+            fn: () => this.cp(int8(this.L))
         },
         0xBE: {
             name: 'CP (HL)',
             args: 0,
             cycles: 8,
-            fn: () => this.cp(this.mem.load8(this.HL))
+            fn: () => this.cp(int8(this.mem.load8(this.HL)))
         },
         0xBF: {
             name: 'CP A',
             args: 0,
             cycles: 4,
-            fn: () => this.cp(this.A)
+            fn: () => this.cp(int8(this.A))
         },
         0xC0: {
             name: 'RET NZ',
@@ -1353,7 +1282,7 @@ export default class Cpu extends Alu {
             name: 'JP NZ,a16',
             args: 2,
             cycles: 12,
-            fn: (word: Word) => {
+            fn: (word: Uint16) => {
                 if (this.flagZ) {
                     this.instructions[0xC2].cycles = 12
                 } else {
@@ -1366,17 +1295,17 @@ export default class Cpu extends Alu {
             name: 'JP a16',
             args: 2,
             cycles: 16,
-            fn: (word: Word) => this.PC = word
+            fn: (word: Uint16) => this.PC = word
         },
         0xC4: {
             name: 'CALL NZ,a16',
             args: 2,
             cycles: 12,
-            fn: (word: Word) => {
+            fn: (word: Uint16) => {
                 if (this.flagZ) {
                     this.instructions[0xC0].cycles = 12
                 } else {
-                    this.call(word)
+                    this.call(uint16(word))
                     this.instructions[0xC0].cycles = 24
                 }
             }
@@ -1391,7 +1320,7 @@ export default class Cpu extends Alu {
             name: 'ADD A,d8',
             args: 1,
             cycles: 8,
-            fn: (byte: Byte) => this.add8(this.A, byte)
+            fn: (byte: Uint8) => this.add8(int8(this.A), int8(int8(byte)))
         },
         0xC7: {
             name: 'RST 00h',
@@ -1425,7 +1354,7 @@ export default class Cpu extends Alu {
             name: 'JP Z,a16',
             args: 2,
             cycles: 12,
-            fn: (word: Word) => {
+            fn: (word: Uint16) => {
                 if (this.flagZ) {
                     this.PC = word
                     this.instructions[0xC2].cycles = 16
@@ -1450,7 +1379,7 @@ export default class Cpu extends Alu {
             name: 'CALL Z,a16',
             args: 2,
             cycles: 12,
-            fn: (word: Word) => {
+            fn: (word: Uint16) => {
                 if (this.flagZ) {
                     this.call(word)
                     this.instructions[0xC0].cycles = 24
@@ -1463,7 +1392,7 @@ export default class Cpu extends Alu {
             name: 'CALL a16',
             args: 2,
             cycles: 24,
-            fn: (word: Word) => {
+            fn: (word: Uint16) => {
                 this.call(word)
             }
         },
@@ -1471,7 +1400,7 @@ export default class Cpu extends Alu {
             name: 'ADC A,d8',
             args: 1,
             cycles: 8,
-            fn: (byte: Byte) => this.adc(this.A, byte)
+            fn: (byte: Uint8) => this.adc(int8(this.A), int8(byte))
         },
         0xCF: {
             name: 'RST 08h',
@@ -1505,7 +1434,7 @@ export default class Cpu extends Alu {
             name: 'JP NC,a16',
             args: 2,
             cycles: 12,
-            fn: (word: Word) => {
+            fn: (word: Uint16) => {
                 if (this.flagC) {
                     this.instructions[0xC2].cycles = 12
                 } else {
@@ -1526,7 +1455,7 @@ export default class Cpu extends Alu {
             name: 'CALL NC,a16',
             args: 2,
             cycles: 12,
-            fn: (word: Word) => {
+            fn: (word: Uint16) => {
                 if (this.flagC) {
                     this.instructions[0xC0].cycles = 12
                 } else {
@@ -1545,7 +1474,7 @@ export default class Cpu extends Alu {
             name: 'SUB d8',
             args: 1,
             cycles: 8,
-            fn: (byte: Byte) => {
+            fn: (byte: Uint8) => {
                 this.flagZ = this.A === byte
                 this.flagN = 1
                 this.flagH = (this.A & 0x0F) < (byte & 0x0F)
@@ -1588,7 +1517,7 @@ export default class Cpu extends Alu {
             name: 'JP C,a16',
             args: 2,
             cycles: 12,
-            fn: (word: Word) => {
+            fn: (word: Uint16) => {
                 if (this.flagC) {
                     this.PC = word
                     this.instructions[0xC2].cycles = 16
@@ -1609,7 +1538,7 @@ export default class Cpu extends Alu {
             name: 'CALL C,a16',
             args: 2,
             cycles: 12,
-            fn: (word: Word) => {
+            fn: (word: Uint16) => {
                 if (this.flagC) {
                     this.call(word)
                     this.instructions[0xC0].cycles = 24
@@ -1630,7 +1559,7 @@ export default class Cpu extends Alu {
             name: 'SDC A,d8',
             args: 1,
             cycles: 8,
-            fn: (byte: Byte) => {
+            fn: (byte: Uint8) => {
                 this.flagZ = this.A === byte + 1
                 this.flagN = 1
                 this.flagH = (this.A & 0x0F) < ((byte + 1) & 0x0F)
@@ -1651,7 +1580,7 @@ export default class Cpu extends Alu {
             name: 'LDH (a8),A',
             args: 1,
             cycles: 12,
-            fn: (byte: Byte) => this.A = this.mem.load8(int16(0xFF00 + byte))
+            fn: (byte: Uint8) => this.mem.store8(this.A, uint16(0xFF00 + byte))
         },
         0xE1: {
             name: 'POP HL',
@@ -1664,7 +1593,7 @@ export default class Cpu extends Alu {
             args: 0,
             cycles: 8,
             fn: () => {
-                this.mem.store8(this.A, int16(0xFF00 + this.C))
+                this.mem.store8(this.A, uint16(0xFF00 + this.C))
             }
         },
         0xE3: {
@@ -1693,7 +1622,7 @@ export default class Cpu extends Alu {
             name: 'AND d8',
             args: 1,
             cycles: 8,
-            fn: (byte: Byte) => this.and(byte)
+            fn: (byte: Uint8) => this.and(byte)
         },
         0xE7: {
             name: 'RST 20h',
@@ -1708,8 +1637,8 @@ export default class Cpu extends Alu {
             name: 'ADD SP,r8',
             args: 1,
             cycles: 16,
-            fn: (byte: Byte) => {
-                this.add16(this.SP, int16(byte))
+            fn: (byte: Uint8) => {
+                this.add16(int16(this.SP), int16(byte))
                 this.flagZ = 0
             }
         },
@@ -1723,7 +1652,7 @@ export default class Cpu extends Alu {
             name: 'LD (a16),A',
             args: 2,
             cycles: 16,
-            fn: (word: Word) => this.mem.store8(this.A, word)
+            fn: (word: Uint16) => this.mem.store8(this.A, word)
         },
         0xEB: {
             name: '-',
@@ -1753,7 +1682,7 @@ export default class Cpu extends Alu {
             name: 'XOR d8',
             args: 0,
             cycles: 1,
-            fn: (byte: Byte) => this.xor(byte)
+            fn: (byte: Uint8) => this.xor(byte)
         },
         0xEF: {
             name: 'RST 28h',
@@ -1768,7 +1697,7 @@ export default class Cpu extends Alu {
             name: 'LDH A,(a8)',
             args: 1,
             cycles: 12,
-            fn: (byte: Byte) => this.mem.store8(this.A, int16(0xFF00 + byte))
+            fn: (byte: Uint8) => this.A = this.mem.load8(uint16(0xFF00 + byte))
         },
         0xF1: {
             name: 'POP AF',
@@ -1781,7 +1710,7 @@ export default class Cpu extends Alu {
             args: 0,
             cycles: 8,
             fn: () => {
-                this.A = this.mem.load8(int16(0xFF00 + this.C))
+                this.A = this.mem.load8(uint16(0xFF00 + this.C))
             }
         },
         0xF3: {
@@ -1808,7 +1737,7 @@ export default class Cpu extends Alu {
             name: 'OR d8',
             args: 1,
             cycles: 8,
-            fn: (byte: Byte) => this.or(byte)
+            fn: (byte: Uint8) => this.or(byte)
         },
         0xF7: {
             name: 'RST 30h',
@@ -1823,7 +1752,7 @@ export default class Cpu extends Alu {
             name: 'LD HL,SP + r8',
             args: 1,
             cycles: 12,
-            fn: (byte: Byte) => {
+            fn: (byte: Uint8) => {
                 const sum = this.SP + byte
 
                 this.flagZ = 0
@@ -1843,7 +1772,7 @@ export default class Cpu extends Alu {
             name: 'LD A,(a16)',
             args: 0,
             cycles: 16,
-            fn: (word: Word) => this.A = this.mem.load8(word)
+            fn: (word: Uint16) => this.A = this.mem.load8(word)
         },
         0xFB: {
             name: 'EI',
@@ -1871,7 +1800,7 @@ export default class Cpu extends Alu {
             name: 'CP d8',
             args: 1,
             cycles: 8,
-            fn: (byte: Byte) => this.cp(byte)
+            fn: (byte: Uint8) => this.cp(int8(byte))
         },        
         0xFF: {
             name: 'RST 38h',
@@ -3435,7 +3364,7 @@ export default class Cpu extends Alu {
         }
         // 16 bit
         else if (instruction.args === 2) {
-            const word = this.mem.load8(this.PC) | (this.mem.load8(int16(this.PC + 1)) << 8)
+            const word = uint16(this.mem.load8(this.PC) | (this.mem.load8(uint16(this.PC + 1)) << 8))
 
             this.PC += 2
             instruction.fn(word)

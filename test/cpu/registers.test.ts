@@ -1,8 +1,10 @@
-import Cpu from "../../src/cpu"
-import { describe, expect, test } from "@jest/globals"
+import Cpu from '../../src/cpu'
+import { describe, expect, test } from '@jest/globals'
+import Memory from '../../src/memory'
 
 describe('Flags', () => {
-    const registers = new Cpu()
+    const mem = new Memory()
+    const registers = new Cpu(mem)
     
     test('Set', () => {
         registers.flagZ = 1
@@ -27,7 +29,8 @@ describe('Flags', () => {
 })
 
 describe('8Bit registers', () => {
-    const registers = new Cpu()
+    const mem = new Memory()
+    const registers = new Cpu(mem)
 
     test('A', () => {
         registers.A = 17
@@ -60,7 +63,8 @@ describe('8Bit registers', () => {
 })
 
 describe('16bit registers', () => {
-    const registers = new Cpu()
+    const mem = new Memory()
+    const registers = new Cpu(mem)
 
     test('AF', () => {
         registers.AF = 743

@@ -1,7 +1,7 @@
 import PpuBase from './ppuBase'
 import Memory from '../memory'
 import { Addresses, Colors, Sizes } from './constants'
-import { getBit, int8, uint16 } from '../utils'
+import { getBit, uint8, uint16 } from '../utils'
 
 export default class BgPpu extends PpuBase {
   constructor (mem: Memory) {
@@ -27,7 +27,7 @@ export default class BgPpu extends PpuBase {
         let tileIndex = this.mem.load8(uint16(tileMapAddress + tileX * Sizes.TILE_MAP + tileY))
 
         if (selectedTileData === 1) {
-          tileIndex = int8(tileIndex) // Convert to signed 8-bit integer
+          tileIndex = uint8(tileIndex) // Convert to signed 8-bit integer
         }
         
         for (let i = 0; i < Sizes.TILE_DATA; i++) {

@@ -3,6 +3,7 @@ import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import Cpu from '../src/cpu'
+import Memory from '../src/memory'
 import { uint16 } from '../src/utils'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -11,14 +12,17 @@ let cpu: Cpu
 
 beforeAll(() => {
   const fileContent = fs.readFileSync(path.resolve(__dirname, './testprogram.bin'))
-  
-  cpu = new Cpu()
-  cpu.mem.rom = new Int8Array(fileContent)
+  const memory = new Memory()
+
+  cpu = new Cpu(memory)
+  cpu.mem.rom = new Uint8Array(fileContent)
 })
 
 describe('Main test', () => {
   it('should run the test program', () => {
-    cpu.start()
+    for (let i = 0; i < 100; i++) {
+      cpu.execute()
+    }
 
     expect(cpu.A).toBe(8)
     expect(cpu.mem.load8(uint16(0xC000))).toBe(8)
