@@ -32,8 +32,8 @@ export default abstract class Alu extends Registers {
         this.flagH = 0
         this.flagC = 0
     }
-    cp (value: Int8) {
-        this.flagZ = this.A - value === 0
+    cp (value: Uint8) {
+        this.flagZ = this.A === value
         this.flagN = 1
         this.flagH = (this.A & 0x0F) < (value & 0x0F)
         this.flagC = this.A < value
@@ -71,7 +71,7 @@ export default abstract class Alu extends Registers {
         this.flagN = 1
         this.flagH = (this.A & 0x0F) < (value & 0x0F)
         this.flagC = this.A < int8(value)
-        this.A -= value
+        this.A = int8(this.A) - value
     }
     sbc (value: Int8): void {
         const valueWithCarry = int8(value + this.flagC)
@@ -264,5 +264,11 @@ export default abstract class Alu extends Registers {
     ret (): void {
         this.PC = this.mem.load16(this.SP)
         this.SP += 2
+    }
+    jr (offset: Int8): void {
+        this.PC += offset
+    }
+    jp (address: Uint16): void {
+        this.PC = address
     }
 }

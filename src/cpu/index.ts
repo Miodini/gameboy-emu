@@ -161,7 +161,7 @@ export default class Cpu extends Alu {
             name: 'JR r8',
             args: 1,
             cycles: 12,
-            fn: (byte: Uint8) => this.PC += byte
+            fn: (byte: Uint8) => this.jr(int8(byte))
         },
         0x19: {
             name: 'ADD HL,DE',
@@ -213,7 +213,7 @@ export default class Cpu extends Alu {
             cycles: 8,
             fn: (byte: Uint8) => {
                 if (!this.flagZ) {
-                    this.PC += byte
+                    this.jr(int8(byte))
                     this.instructions[0x20].cycles = 12
                 } else {
                     this.instructions[0x20].cycles = 8
@@ -293,7 +293,7 @@ export default class Cpu extends Alu {
             cycles: 8,
             fn: (byte: Uint8) => {
                 if (this.flagZ) {
-                    this.PC += byte
+                    this.jr(int8(byte))
                     this.instructions[0x28].cycles = 12
                 } else {
                     this.instructions[0x28].cycles = 8
@@ -355,7 +355,7 @@ export default class Cpu extends Alu {
             cycles: 8,
             fn: (byte: Uint8) => {
                 if (!this.flagC) {
-                    this.PC += byte
+                    this.jr(int8(byte))
                     this.instructions[0x30].cycles = 12
                 } else {
                     this.instructions[0x30].cycles = 8
@@ -429,7 +429,7 @@ export default class Cpu extends Alu {
             cycles: 8,
             fn: (byte: Uint8) => {
                 if (this.flagC) {
-                    this.PC += byte
+                    this.jr(int8(byte))
                     this.instructions[0x38].cycles = 12
                 } else {
                     this.instructions[0x38].cycles = 8
@@ -1215,49 +1215,49 @@ export default class Cpu extends Alu {
             name: 'CP B',
             args: 0,
             cycles: 4,
-            fn: () => this.cp(int8(this.B))
+            fn: () => this.cp(this.B)
         },
         0xB9: {
             name: 'CP C',
             args: 0,
             cycles: 4,
-            fn: () => this.cp(int8(this.C))
+            fn: () => this.cp(this.C)
         },
         0xBA: {
             name: 'CP D',
             args: 0,
             cycles: 4,
-            fn: () => this.cp(int8(this.D))
+            fn: () => this.cp(this.D)
         },
         0xBB: {
             name: 'CP E',
             args: 0,
             cycles: 4,
-            fn: () => this.cp(int8(this.E))
+            fn: () => this.cp(this.E)
         },
         0xBC: {
             name: 'CP H',
             args: 0,
             cycles: 4,
-            fn: () => this.cp(int8(this.H))
+            fn: () => this.cp(this.H)
         },
         0xBD: {
             name: 'CP L',
             args: 0,
             cycles: 4,
-            fn: () => this.cp(int8(this.L))
+            fn: () => this.cp(this.L)
         },
         0xBE: {
             name: 'CP (HL)',
             args: 0,
             cycles: 8,
-            fn: () => this.cp(int8(this.mem.load8(this.HL)))
+            fn: () => this.cp(this.mem.load8(this.HL))
         },
         0xBF: {
             name: 'CP A',
             args: 0,
             cycles: 4,
-            fn: () => this.cp(int8(this.A))
+            fn: () => this.cp(this.A)
         },
         0xC0: {
             name: 'RET NZ',
@@ -1283,11 +1283,11 @@ export default class Cpu extends Alu {
             args: 2,
             cycles: 12,
             fn: (word: Uint16) => {
-                if (this.flagZ) {
-                    this.instructions[0xC2].cycles = 12
-                } else {
-                    this.PC = word
+                if (!this.flagZ) {
+                    this.jp(word)
                     this.instructions[0xC2].cycles = 16
+                } else {
+                    this.instructions[0xC2].cycles = 12
                 }
             }
         },
@@ -1295,7 +1295,7 @@ export default class Cpu extends Alu {
             name: 'JP a16',
             args: 2,
             cycles: 16,
-            fn: (word: Uint16) => this.PC = word
+            fn: (word: Uint16) => this.jp(word)
         },
         0xC4: {
             name: 'CALL NZ,a16',
@@ -1356,7 +1356,7 @@ export default class Cpu extends Alu {
             cycles: 12,
             fn: (word: Uint16) => {
                 if (this.flagZ) {
-                    this.PC = word
+                    this.jp(word)
                     this.instructions[0xC2].cycles = 16
                 } else {
                     this.instructions[0xC2].cycles = 12
@@ -1435,11 +1435,11 @@ export default class Cpu extends Alu {
             args: 2,
             cycles: 12,
             fn: (word: Uint16) => {
-                if (this.flagC) {
-                    this.instructions[0xC2].cycles = 12
-                } else {
-                    this.PC = word
+                if (!this.flagC) {
+                    this.jp(word)
                     this.instructions[0xC2].cycles = 16
+                } else {
+                    this.instructions[0xC2].cycles = 12
                 }
             }
         },
@@ -1519,7 +1519,7 @@ export default class Cpu extends Alu {
             cycles: 12,
             fn: (word: Uint16) => {
                 if (this.flagC) {
-                    this.PC = word
+                    this.jp(word)
                     this.instructions[0xC2].cycles = 16
                 } else {
                     this.instructions[0xC2].cycles = 12
@@ -1646,7 +1646,7 @@ export default class Cpu extends Alu {
             name: 'JP HL',
             args: 1,
             cycles: 4,
-            fn: () => this.PC = this.HL
+            fn: () => this.jp(this.HL)
         },
         0xEA: {
             name: 'LD (a16),A',
@@ -1800,7 +1800,7 @@ export default class Cpu extends Alu {
             name: 'CP d8',
             args: 1,
             cycles: 8,
-            fn: (byte: Uint8) => this.cp(int8(byte))
+            fn: (byte: Uint8) => this.cp(byte)
         },        
         0xFF: {
             name: 'RST 38h',
@@ -3353,6 +3353,7 @@ export default class Cpu extends Alu {
         if (this.stopFlag || this.haltFlag) return
         const instruction = this.instructions[uint8(this.mem.load8(this.PC))]
 
+        console.log(`0x${this.PC.toString(16).toUpperCase().padStart(4, '0')} - ${instruction.name}`)
         this.PC++
 
         // 8 bit
