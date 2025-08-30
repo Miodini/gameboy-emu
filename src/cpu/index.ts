@@ -1680,7 +1680,7 @@ export default class Cpu extends Alu {
         },
         0xEE: {
             name: 'XOR d8',
-            args: 0,
+            args: 1,
             cycles: 1,
             fn: (byte: Uint8) => this.xor(byte)
         },
@@ -1770,7 +1770,7 @@ export default class Cpu extends Alu {
         },
         0xFA: {
             name: 'LD A,(a16)',
-            args: 0,
+            args: 2,
             cycles: 16,
             fn: (word: Uint16) => this.A = this.mem.load8(word)
         },
