@@ -41,11 +41,11 @@ export default class Memory {
     // Memory regions
 
     get rom (): Uint8Array {
-        return this.memory.subarray(0, 0x4000)
+        return this.memory.subarray(0, 0x8000)
     }
 
     set rom (value: Uint8Array) {
-        this.memory.set(value.subarray(0, 0x4000))
+        this.memory.set(value.subarray(0, 0x8000))
     }
 
     // Hardware registers
