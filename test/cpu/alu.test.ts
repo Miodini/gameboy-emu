@@ -117,7 +117,7 @@ describe('Logical', () => {
     })
     test('cp', () => {
         cpu.A = 3
-        cpu.cp(int8(3))
+        cpu.cp(uint8(3))
         expect(cpu.flagZ).toBe(1)
     })
 })
