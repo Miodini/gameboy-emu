@@ -2,10 +2,11 @@ import { WorkerTypes as WT } from './types'
 import { Sizes } from './ppu/constants'
 import { startMemoryDumper } from './memory/dumper'
 
+const PIXEL_SIZE = 5
 const fileInput = document.getElementById('fileInput') as HTMLInputElement
 const canvas = document.createElement('canvas')
-const PIXEL_SIZE = 5
 const worker = new Worker(new URL('./workers', import.meta.url))
+let isPaused = false
 
 const initializeHtml = () => {
   const pauseButton = document.getElementById('pause') as HTMLButtonElement
@@ -14,6 +15,11 @@ const initializeHtml = () => {
     worker.postMessage({
       messageType: WT.MessageType.Pause
     })
+
+    isPaused = !isPaused
+    pauseButton.innerHTML = isPaused
+      ? '<span class="material-symbols-outlined">play_arrow</span>'
+      : '<span class="material-symbols-outlined">pause</span>'
   })
 
   canvas.width = Sizes.VISIBLE_SCREEN_WIDTH * PIXEL_SIZE
