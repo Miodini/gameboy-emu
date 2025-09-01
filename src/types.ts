@@ -8,15 +8,19 @@ export type BitPosition = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7
 
 export namespace WorkerTypes {
   export enum MessageType {
+    Init,
     Dump,
     Load,
     Pause
   }
 
-  export type LoadMessagePayload = {
-    romData: Uint8Array,
+  export type InitMessagePayload = {
     canvas: OffscreenCanvas,
     pixelSize: number
+  }
+
+  export type LoadMessagePayload = {
+    romData: Uint8Array
   }
 
   export type DumpMessagePayload = {
@@ -25,6 +29,7 @@ export namespace WorkerTypes {
   }
 
   export type WorkerMessage =
+    | { messageType: MessageType.Init, payload: InitMessagePayload }
     | { messageType: MessageType.Dump, payload: DumpMessagePayload }
     | { messageType: MessageType.Load, payload: LoadMessagePayload }
     | { messageType: MessageType.Pause }

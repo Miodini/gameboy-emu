@@ -14,7 +14,7 @@ export default class Memory implements IMemory {
     // io = 0xFF7F - 0xFF00
     // hram = 0xFFFE - 0xFF80
     // ie = 0xFFFF
-    readonly memory = new Uint8Array(0xFFFF)
+    public readonly memory = new Uint8Array(0xFFFF)
 
     constructor () {
         if (FORCE_VBLANK) {

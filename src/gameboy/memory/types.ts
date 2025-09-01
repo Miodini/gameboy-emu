@@ -1,6 +1,7 @@
 import type { Uint8, Uint16 } from '../../types'
 
 export interface IMemory {
+  memory: Uint8Array
   load8(address: Uint16): Uint8
   load16(address: Uint16): Uint16
   store8(value: Uint8, address: Uint16): void

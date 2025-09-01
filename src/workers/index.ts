@@ -1,36 +1,36 @@
-import Memory from '../gameboy/memory'
-import Ppu from '../gameboy/ppu'
-import Cpu from '../gameboy/cpu'
+import type { IGameBoy } from '../gameboy/types'
+import GameBoy from '../gameboy/gameboy'
 import { WorkerTypes as WT } from '../types'
 
-const mem = new Memory()
-const cpu = new Cpu(mem)
+let gameBoy: IGameBoy
 
-const onLoad = (canvas: OffscreenCanvas, romData: Uint8Array, pixelSize: number) => {
-  const ppu = new Ppu(mem, canvas, pixelSize)
+const onInit = (canvas: OffscreenCanvas, pixelSize: number) => {
+  gameBoy = new GameBoy(canvas, pixelSize)
+}
 
-  // Handle the Load message type
-  mem.rom = romData
-  setInterval(() => {
-    for (let i = 0; i < 30; i++) {
-      cpu.execute()
-    }
-    ppu.draw()
-  }, 5)
+const onLoad = (romData: Uint8Array) => {
+  gameBoy.loadRom(romData)
+  gameBoy.start()
 }
 
 const onDump = (startAddress: number, endAddress: number) => {
-  console.log(mem.memory.subarray(startAddress, endAddress))
+  gameBoy.dump(startAddress, endAddress)
 }
 
 const onPause = () => {
-  cpu.haltFlag = !cpu.haltFlag
+  gameBoy.pauseResume()
 }
 
 onmessage = (event: MessageEvent<WT.WorkerMessage>) => {
   const { messageType } = event.data
 
   switch (messageType) {
+    case WT.MessageType.Init: {
+      const { canvas, pixelSize } = event.data.payload
+
+      onInit(canvas, pixelSize)
+      break
+    }
     case WT.MessageType.Dump: {
       const { startAddress, endAddress } = event.data.payload
       
@@ -38,9 +38,9 @@ onmessage = (event: MessageEvent<WT.WorkerMessage>) => {
       break
     }
     case WT.MessageType.Load: {
-      const { canvas, romData, pixelSize } = event.data.payload
+      const { romData } = event.data.payload
 
-      onLoad(canvas, romData, pixelSize)
+      onLoad(romData)
       break
     }
     case WT.MessageType.Pause: {
