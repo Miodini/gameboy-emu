@@ -1,6 +1,6 @@
-import Cpu from '../../src/cpu'
+import Cpu from '../../../src/gameboy/cpu'
 import { describe, expect, test } from '@jest/globals'
-import Memory from '../../src/memory'
+import Memory from '../../../src/gameboy/memory'
 
 describe('Flags', () => {
     const mem = new Memory()

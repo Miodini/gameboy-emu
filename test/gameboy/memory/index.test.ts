@@ -1,5 +1,5 @@
-import Memory from '../../src/memory'
-import { int8, uint8, int16, uint16 } from '../../src/utils'
+import Memory from '../../../src/gameboy/memory'
+import { uint8, uint16 } from '../../../src/utils'
 import { describe, expect, test, beforeEach } from '@jest/globals'
 
 describe('Memory', () => {

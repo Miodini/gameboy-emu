@@ -1,4 +1,4 @@
-import { WorkerTypes as WT } from '../types'
+import { WorkerTypes as WT } from '../../types'
 
 const startAddressInput = document.getElementById('memStart') as HTMLInputElement
 const endAddressInput = document.getElementById('memEnd') as HTMLInputElement

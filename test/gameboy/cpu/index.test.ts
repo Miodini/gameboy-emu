@@ -1,9 +1,9 @@
 /** Important: when testing registers, make sure to cast the `toBe` argument to the same data type (signed vs unsigned) */
 import { jest, describe, expect, test, beforeEach } from '@jest/globals'
-import Cpu from '../../src/cpu'
-import Memory from '../../src/memory'
-import { int8, uint8, int16, uint16 } from '../../src/utils.js'
-import type { Bit, Uint8, Uint16 } from '../../src/types.js'
+import Cpu from '../../../src/gameboy/cpu'
+import Memory from '../../../src/gameboy/memory'
+import { int8, uint8, int16, uint16 } from '../../../src/utils.js'
+import type { Bit, Uint8, Uint16 } from '../../../src/types.js'
 jest.mock('../../src/cpu')
 
 const mem = new Memory()

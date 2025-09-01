@@ -3,8 +3,8 @@ import type { IPpu, IBgPpu, IObjectPpu } from "./types"
 import BgPpu from "./bgPpu"
 import ObjectPpu from "./objectPpu"
 import { Addresses, Colors, Sizes } from "./constants"
-import { pkmnVramDump, pkmnOamDump } from '../../mock/mocks'
-import { getBit, uint8, uint16 } from "../utils"
+import { pkmnVramDump, pkmnOamDump } from '../../../mock/mocks'
+import { getBit, uint8, uint16 } from "../../utils"
 
 export default class Ppu implements IPpu {
   private readonly mem: IMemory

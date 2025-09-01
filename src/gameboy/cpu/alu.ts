@@ -1,8 +1,8 @@
 import type { IAlu } from './types'
 import type { IMemory } from '../memory/types'
-import type { BitPosition, Int8, Uint8, Int16, Uint16 } from '../types'
+import type { BitPosition, Int8, Uint8, Int16, Uint16 } from '../../types'
 import Registers from './registers'
-import { bit, int8, int16, uint8, uint16 } from '../utils'
+import { bit, int8, int16, uint8, uint16 } from '../../utils'
 
 /** Arithmetic Logic Unit */
 export default abstract class Alu extends Registers implements IAlu {

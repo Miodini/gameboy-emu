@@ -1,6 +1,6 @@
 import type { IRegisters } from "./types"
-import type { Bit, Uint8, Uint16 } from "../types"
-import { uint8, uint16 } from "../utils"
+import type { Bit, Uint8, Uint16 } from "../../types"
+import { uint8, uint16 } from "../../utils"
 
 export default abstract class Registers implements IRegisters{
     // General Purpose Registers

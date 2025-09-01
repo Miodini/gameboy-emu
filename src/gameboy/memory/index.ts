@@ -1,6 +1,6 @@
 import type { IMemory } from './types'
-import type { Uint8, Uint16 } from '../types'
-import { uint8, uint16 } from '../utils'
+import type { Uint8, Uint16 } from '../../types'
+import { uint8, uint16 } from '../../utils'
 
 const FORCE_VBLANK = false
 

@@ -2,7 +2,7 @@ import type { IMemory } from '../memory/types'
 import type { IObjectPpu } from './types'
 import PpuBase from './ppuBase'
 import { Addresses, Sizes } from './constants'
-import { getBit, uint8, uint16 } from '../utils'
+import { getBit, uint8, uint16 } from '../../utils'
 import { Colors } from './constants'
 
 export default class ObjectPpu extends PpuBase implements IObjectPpu {

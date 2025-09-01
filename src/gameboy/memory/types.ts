@@ -1,4 +1,4 @@
-import type { Uint8, Uint16 } from '../types'
+import type { Uint8, Uint16 } from '../../types'
 
 export interface IMemory {
   load8(address: Uint16): Uint8

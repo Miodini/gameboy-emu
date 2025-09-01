@@ -1,5 +1,5 @@
 import type { IMemory } from '../memory/types'
-import type { Bit, BitPosition, Uint8, Int8, Uint16, Int16 } from '../types'
+import type { Bit, BitPosition, Uint8, Int8, Uint16, Int16 } from '../../types'
 
 export type Instruction = {
   readonly name: string,

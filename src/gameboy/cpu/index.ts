@@ -1,7 +1,7 @@
 import type { ICpu, Instruction } from './types'
-import type { Uint8, Uint16 } from '../types'
+import type { Uint8, Uint16 } from '../../types'
 import Alu from "./alu"
-import { int8, uint8, int16, uint16 } from '../utils'
+import { int8, uint8, int16, uint16 } from '../../utils'
 
 let log: string[] = []
 

@@ -2,7 +2,7 @@ import type { IMemory } from '../memory/types'
 import type { IBgPpu } from './types'
 import PpuBase from './ppuBase'
 import { Addresses, Colors, Sizes } from './constants'
-import { getBit, uint8, uint16 } from '../utils'
+import { getBit, uint8, uint16 } from '../../utils'
 
 export default class BgPpu extends PpuBase implements IBgPpu {
   constructor (mem: IMemory) {

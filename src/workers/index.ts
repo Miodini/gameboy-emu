@@ -1,6 +1,6 @@
-import Memory from '../memory'
-import Ppu from '../ppu'
-import Cpu from '../cpu'
+import Memory from '../gameboy/memory'
+import Ppu from '../gameboy/ppu'
+import Cpu from '../gameboy/cpu'
 import { WorkerTypes as WT } from '../types'
 
 const mem = new Memory()

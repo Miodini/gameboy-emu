@@ -1,7 +1,7 @@
 /** Important: when testing registers, make sure to cast the `toBe` argument to the same data type (signed vs unsigned) */
-import Cpu from '../../src/cpu'
-import Memory from '../../src/memory'
-import { bit, int8, uint8, int16 } from '../../src/utils.js'
+import Cpu from '../../../src/gameboy/cpu'
+import Memory from '../../../src/gameboy/memory'
+import { bit, int8, uint8, int16 } from '../../../src/utils.js'
 import { describe, expect, test, beforeEach } from '@jest/globals'
 
 const mem = new Memory()

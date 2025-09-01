@@ -4,8 +4,8 @@
  */
 import 'jest-canvas-mock'
 import { describe, expect, it } from '@jest/globals'
-import Memory from '../../src/memory'
-import Ppu from '../../src/ppu'
+import Memory from '../../../src/gameboy/memory'
+import Ppu from '../../../src/gameboy/ppu'
 
 // TODO: Find a way to test offscreen canvas
 describe.skip('BgPpu', () => {

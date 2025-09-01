@@ -1,6 +1,6 @@
 import { WorkerTypes as WT } from './types'
-import { Sizes } from './ppu/constants'
-import { startMemoryDumper } from './memory/dumper'
+import { Sizes } from './gameboy/ppu/constants'
+import { startMemoryDumper } from './gameboy/memory/dumper'
 
 const PIXEL_SIZE = 5
 const fileInput = document.getElementById('fileInput') as HTMLInputElement
