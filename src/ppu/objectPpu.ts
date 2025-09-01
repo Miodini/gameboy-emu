@@ -1,11 +1,12 @@
+import type { IMemory } from '../memory/types'
+import type { IObjectPpu } from './types'
 import PpuBase from './ppuBase'
-import Memory from '../memory'
 import { Addresses, Sizes } from './constants'
 import { getBit, uint8, uint16 } from '../utils'
 import { Colors } from './constants'
 
-export default class ObjectPpu extends PpuBase {
-  constructor (mem: Memory) {
+export default class ObjectPpu extends PpuBase implements IObjectPpu {
+  constructor (mem: IMemory) {
     const screenMatrix: (Colors | null)[][] = new Array(Sizes.SCREEN_HEIGHT)
 
     for (let i = 0; i < Sizes.SCREEN_HEIGHT; i++) {
@@ -18,14 +19,14 @@ export default class ObjectPpu extends PpuBase {
    * @override 
    * Sprites' color 0 is transparent rather than white.
   */
-  protected getColor (value: number): Colors | null {
+  protected override getColor (value: number): Colors | null {
     return value === 0 ? null : super.getColor(value)
   }
 
   /** Draws objects (sprites) as defined in OAM 
    * TODO: Implement sprite priority
   */
-  public draw () {
+  public draw (): (Colors | null)[][] {
     const is8x16 = getBit(this.mem.LCDC, 2) === 1
 
     for (let i = 0; i < Sizes.OAM_ENTRIES * Sizes.OAM_ENTRY_SIZE; i += Sizes.OAM_ENTRY_SIZE) {

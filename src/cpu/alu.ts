@@ -1,38 +1,37 @@
+import type { IAlu } from './types'
+import type { IMemory } from '../memory/types'
 import type { BitPosition, Int8, Uint8, Int16, Uint16 } from '../types'
 import Registers from './registers'
-import Memory from '../memory'
 import { bit, int8, int16, uint8, uint16 } from '../utils'
 
 /** Arithmetic Logic Unit */
-export default abstract class Alu extends Registers {
-    mem: Memory
-    constructor (mem: Memory) {
+export default abstract class Alu extends Registers implements IAlu {
+    constructor (protected mem: IMemory) {
         super()
-        this.mem = mem
     }
     /* ----- LOGIC OPERATIONS ----- */
-    and (value: Uint8) {
+    and (value: Uint8): void {
         this.A &= value
         this.flagZ = this.A === 0
         this.flagN = 0
         this.flagH = 1
         this.flagC = 0
     }
-    or (value: Uint8) {
+    or (value: Uint8): void {
         this.A |= value
         this.flagZ = this.A === 0
         this.flagN = 0
         this.flagH = 0
         this.flagC = 0  
     }
-    xor (value: Uint8) {
+    xor (value: Uint8): void {
         this.A ^= value
         this.flagZ = this.A === 0
         this.flagN = 0
         this.flagH = 0
         this.flagC = 0
     }
-    cp (value: Uint8) {
+    cp (value: Uint8): void {
         this.flagZ = this.A === value
         this.flagN = 1
         this.flagH = (this.A & 0x0F) < (value & 0x0F)

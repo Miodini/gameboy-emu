@@ -1,10 +1,11 @@
+import type { IMemory } from '../memory/types'
+import type { IBgPpu } from './types'
 import PpuBase from './ppuBase'
-import Memory from '../memory'
 import { Addresses, Colors, Sizes } from './constants'
 import { getBit, uint8, uint16 } from '../utils'
 
-export default class BgPpu extends PpuBase {
-  constructor (mem: Memory) {
+export default class BgPpu extends PpuBase implements IBgPpu {
+  constructor (mem: IMemory) {
     const screenMatrix: Colors[][] = new Array(Sizes.SCREEN_HEIGHT)
 
     for (let i = 0; i < Sizes.SCREEN_HEIGHT; i++) {
@@ -14,7 +15,7 @@ export default class BgPpu extends PpuBase {
   }
 
   /** Draws a screen-full of tiles. Some are displayed outside of the screen boundaries */
-  public draw () {
+  public draw (): (Colors | null)[][] {
     let screenX = 0, screenY = 0
     const selectedTileMap = getBit(this.mem.LCDC, 3) === 0 ? 0 : 1
     const selectedTileData = getBit(this.mem.LCDC, 4) === 0 ? 1 : 0

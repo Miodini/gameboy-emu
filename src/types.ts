@@ -6,13 +6,6 @@ export type Uint16 = number & { __brand: 'uint16' }
 /** Bit position within one byte (0-indexed) */
 export type BitPosition = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7
 
-export type Instruction = {
-  readonly name: string,
-  readonly args: number,
-  cycles: number,
-  // Ideally, fn params should be either undefined, Uint8 or Uint16
-  readonly fn: (param?: any) => void
-}
 export namespace WorkerTypes {
   export enum MessageType {
     Dump,

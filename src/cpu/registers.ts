@@ -1,7 +1,8 @@
+import type { IRegisters } from "./types"
 import type { Bit, Uint8, Uint16 } from "../types"
 import { uint8, uint16 } from "../utils"
 
-export default abstract class Registers {
+export default abstract class Registers implements IRegisters{
     // General Purpose Registers
     private reg_af = new Int8Array(2) // A(8) ZNHC0000
     private reg_bc = new Int8Array(2)

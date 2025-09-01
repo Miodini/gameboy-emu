@@ -1,15 +1,8 @@
-import type Memory from '../memory'
+import type { IMemory } from '../memory/types'
 import { Colors, Sizes } from './constants'
-// import ObjectPpu from './objectPpu'
 
 export default abstract class PpuBase {
-  readonly mem: Memory
-  readonly screenMatrix: (Colors | null)[][]
- 
-  constructor (mem: Memory, screenMatrix: (Colors | null)[][]) {
-    this.mem = mem
-    this.screenMatrix = screenMatrix
-  }
+  constructor (public readonly mem: IMemory, public readonly screenMatrix: (Colors | null)[][]) {}
 
   protected getColor (value: number): Colors | null {
     switch (value) {

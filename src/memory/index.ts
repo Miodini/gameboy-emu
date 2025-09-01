@@ -1,9 +1,10 @@
+import type { IMemory } from './types'
 import type { Uint8, Uint16 } from '../types'
 import { uint8, uint16 } from '../utils'
 
-const FORCE_VBLANK = true
+const FORCE_VBLANK = false
 
-export default class Memory {
+export default class Memory implements IMemory {
     // rom - 0x0000 - 0x3FFF
     // rom bank 1 - 0x4000 - 0x7FFF
     // vram = 0x9FFF - 0x8000
@@ -17,7 +18,7 @@ export default class Memory {
 
     constructor () {
         if (FORCE_VBLANK) {
-            this.LY = uint8(0x91)
+            this.LY = uint8(0x94)
         }
     }
 

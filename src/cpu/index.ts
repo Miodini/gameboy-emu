@@ -1,17 +1,20 @@
-import type { Uint8, Uint16, Instruction } from '../types'
+import type { ICpu, Instruction } from './types'
+import type { Uint8, Uint16 } from '../types'
 import Alu from "./alu"
 import { int8, uint8, int16, uint16 } from '../utils'
 
-export default class Cpu extends Alu {
-    stopFlag = false // Not related to the hardware. Tells whether the emulator should stop executing code
-    haltFlag = false // // Not related to the hardware. Used by the HALT instruction
-    interruptEnabled = true
+let log: string[] = []
+
+export default class Cpu extends Alu implements ICpu {
+    public stopFlag = false // Not related to the hardware. Tells whether the emulator should stop executing code
+    public haltFlag = false // // Not related to the hardware. Used by the HALT instruction
+    public interruptEnabled = true
 
     /**
      * NOTE: The cycles counter may be modified by the instruction itself, so evaluate that after
      * the instruction is run
      */
-    instructions: {[opCode: number]: Instruction} = {
+    public instructions: {[opCode: number]: Instruction} = {
         0x00: {
             name: 'NOP',
             args: 0,
@@ -3349,11 +3352,16 @@ export default class Cpu extends Alu {
         },
     }
 
-    execute = () => {
+    public execute = () => {
         if (this.stopFlag || this.haltFlag) return
         const instruction = this.instructions[uint8(this.mem.load8(this.PC))]
 
-        console.log(`0x${this.PC.toString(16).toUpperCase().padStart(4, '0')} - ${instruction.name}`)
+        log.push(`0x${this.PC.toString(16).toUpperCase().padStart(4, '0')} - ${instruction.name}`)
+        if (log.length >= 1000) {
+            console.log(log)
+            log = []
+        }
+        // debugger
         this.PC++
 
         // 8 bit

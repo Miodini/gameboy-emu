@@ -10,20 +10,11 @@ const onLoad = (canvas: OffscreenCanvas, romData: Uint8Array, pixelSize: number)
   const ppu = new Ppu(mem, canvas, pixelSize)
 
   // Handle the Load message type
-  cpu.mem.rom = romData
+  mem.rom = romData
   setInterval(() => {
-    cpu.execute()
-    cpu.execute()
-    cpu.execute()
-    cpu.execute()
-    cpu.execute()
-    cpu.execute()
-    cpu.execute()
-    cpu.execute()
-    cpu.execute()
-    cpu.execute()
-    cpu.execute()
-    cpu.execute()
+    for (let i = 0; i < 30; i++) {
+      cpu.execute()
+    }
     ppu.draw()
   }, 5)
 }

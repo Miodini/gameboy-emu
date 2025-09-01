@@ -1,14 +1,15 @@
-import Memory from "../memory"
+import type { IMemory } from "../memory/types"
+import type { IPpu, IBgPpu, IObjectPpu } from "./types"
 import BgPpu from "./bgPpu"
 import ObjectPpu from "./objectPpu"
 import { Addresses, Colors, Sizes } from "./constants"
 import { pkmnVramDump, pkmnOamDump } from '../../mock/mocks'
 import { getBit, uint8, uint16 } from "../utils"
 
-export default class Ppu {
-  private readonly mem: Memory
-  private readonly bgPpu: BgPpu
-  private readonly objPpu: ObjectPpu
+export default class Ppu implements IPpu {
+  private readonly mem: IMemory
+  private readonly bgPpu: IBgPpu
+  private readonly objPpu: IObjectPpu
   private readonly canvas: OffscreenCanvas
   private readonly colorMap = {
     [Colors.WHITE]: '#FFFFFF',
@@ -18,7 +19,7 @@ export default class Ppu {
   } as const
   private pixelSize: number
 
-  constructor (memoryInstance: Memory, canvas: OffscreenCanvas, pixelSize: number = 5) {
+  constructor (memoryInstance: IMemory, canvas: OffscreenCanvas, pixelSize: number = 5) {
     this.canvas = canvas
     this.pixelSize = pixelSize
 
