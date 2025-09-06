@@ -2,9 +2,8 @@ import type { IMemory } from "../memory/types"
 import type { IPpu, IBgPpu, IObjectPpu } from "./types"
 import BgPpu from "./bgPpu"
 import ObjectPpu from "./objectPpu"
-import { Addresses, Colors, Sizes } from "./constants"
-import { pkmnVramDump, pkmnOamDump } from '../../../mock/mocks'
-import { getBit, uint8, uint16 } from "../../utils"
+import { Colors, Sizes } from "./constants"
+import { getBit, setBit, uint8 } from "../../utils"
 
 export default class Ppu implements IPpu {
   private readonly mem: IMemory
@@ -37,8 +36,30 @@ export default class Ppu implements IPpu {
     return context
   }
 
-  /* The draw method of `bgPpu` and `objPpu` return arrays with color data
-   * This method is the responsible for drawing the rects on the actual canvas
+  /** Increases the LY register (vertical line), and updates related flags */
+  private updateLy () {
+    this.mem.LY++
+
+    if (this.mem.LY === this.mem.LYC) {
+      this.mem.STAT = setBit(this.mem.STAT, 2)
+      
+      // If LYC int select is enabled, fires an LCD interrupt
+      if (getBit(this.mem.STAT, 6)) {
+        this.mem.IF = setBit(this.mem.IF, 1)
+      }
+    }
+    if (this.mem.LY === 144) {
+      // Enable V-Blank interrupt flag
+      this.mem.IF = setBit(this.mem.IF, 0)
+    } else if (this.mem.LY > Sizes.SCREEN_HEIGHT) {
+      // End of V-Blank period
+      this.mem.LY = 0
+    }
+  }
+
+  /* The draw method of `bgPpu` and `objPpu` return arrays with color data.\
+   * This method is the responsible for drawing the rects on the actual canvas.\
+   * Each call draws one scanline, according to the current value of Memory.LY
   */
   public drawScanLine = () => {
     if (getBit(this.mem.LCDC, 7) === 1) {
@@ -70,9 +91,6 @@ export default class Ppu implements IPpu {
       }
     }
 
-    this.mem.LY++
-    if (this.mem.LY > Sizes.SCREEN_HEIGHT) {
-      this.mem.LY = uint8(0)
-    }
+    this.updateLy()
   }
 }

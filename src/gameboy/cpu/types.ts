@@ -60,6 +60,8 @@ export interface IRegisters {
 
   get SP (): Uint16
   set SP (value: number)
+
+  ime: boolean
 }
 
 export interface IAlu extends IRegisters {
@@ -103,10 +105,13 @@ export interface IAlu extends IRegisters {
 export interface ICpu extends IAlu {
   stopFlag: boolean
   haltFlag: boolean
-  interruptEnabled: boolean
   instructions: {[opCode: number]: Instruction}
   /**
    * @returns Number of cycles of currently executed instruction
    */
   execute: () => number
+  /**
+   * @returns true if an interruption is detected and accepted
+   */
+  checkForInterrupts: () => boolean
 }

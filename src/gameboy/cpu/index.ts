@@ -1,14 +1,11 @@
 import type { ICpu, Instruction } from './types'
-import type { Uint8, Uint16 } from '../../types'
+import type { BitPosition, Uint8, Uint16 } from '../../types'
 import Alu from "./alu"
-import { int8, uint8, int16, uint16 } from '../../utils'
-
-let log: string[] = []
+import { getBit, resetBit, int8, uint8, int16, uint16 } from '../../utils'
 
 export default class Cpu extends Alu implements ICpu {
     public stopFlag = false // Not related to the hardware. Tells whether the emulator should stop executing code
     public haltFlag = false // // Not related to the hardware. Used by the HALT instruction
-    public interruptEnabled = true
 
     /**
      * NOTE: The cycles counter may be modified by the instruction itself, so evaluate that after
@@ -395,7 +392,7 @@ export default class Cpu extends Alu implements ICpu {
                 this.flagZ = value === 0xFF
                 this.flagH = (value & 0x0F) === 0x0F
                 this.flagN = 0
-                this.mem.store8(uint8(value + 1), this.HL)
+                this.mem.store8(value + 1, this.HL)
             }
         },
         0x35: {
@@ -407,7 +404,7 @@ export default class Cpu extends Alu implements ICpu {
                 this.flagZ = value === 0x01
                 this.flagH = (value & 0x0F) === 0
                 this.flagN = 1
-                this.mem.store8(uint8(value - 1), this.HL)
+                this.mem.store8(value - 1, this.HL)
             }
         },
         0x36: {
@@ -1512,7 +1509,7 @@ export default class Cpu extends Alu implements ICpu {
             args: 0,
             cycles: 16,
             fn: () => {
-                // TODO: check this funcion
+                this.ime = true
                 this.ret()
             }
         },
@@ -1720,7 +1717,7 @@ export default class Cpu extends Alu implements ICpu {
             name: 'DI',
             args: 0,
             cycles: 1,
-            fn: () => this.interruptEnabled = false
+            fn: () => this.ime = false
         },
         0xF4: {
             name: '-',
@@ -1781,7 +1778,7 @@ export default class Cpu extends Alu implements ICpu {
             name: 'EI',
             args: 0,
             cycles: 8,
-            fn: () => this.interruptEnabled = true
+            fn: () => this.ime = true
         },
         0xFC: {
             name: '-',
@@ -3350,6 +3347,27 @@ export default class Cpu extends Alu implements ICpu {
             cycles: 8,
             fn: () => this.A = this.set(7, this.A)
         },
+    }
+
+    public checkForInterrupts = () => {
+        if (this.ime) {
+            /*
+             * There are 5 interrupt sources, from bits 0 to 4
+             * This loops checks if bit `i` of IE and IF are both set and, if so,
+             * resets the bit, stores PC in stack and jumps to the interruption handler address.
+            */
+            for (let i: BitPosition = 0; i < 5; i++) {
+                i = i as BitPosition
+                if (getBit(this.mem.IE, i) && getBit(this.mem.IF, i)) {
+                    this.mem.IF = resetBit(this.mem.IF, i)
+                    this.push(this.PC)
+                    this.PC = 0x0040 + (i * 8)
+                    return true
+                }
+            }
+        }
+
+        return false
     }
 
     public execute = () => {

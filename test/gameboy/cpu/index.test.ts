@@ -2,9 +2,9 @@
 import { jest, describe, expect, test, beforeEach } from '@jest/globals'
 import Cpu from '../../../src/gameboy/cpu'
 import Memory from '../../../src/gameboy/memory'
-import { int8, uint8, int16, uint16 } from '../../../src/utils.js'
+import { setBit, resetBit, int8, uint8, int16, uint16 } from '../../../src/utils.js'
 import type { Bit, Uint8, Uint16 } from '../../../src/types.js'
-jest.mock('../../src/cpu')
+jest.mock('../../../src/gameboy/cpu')
 
 const mem = new Memory()
 const cpu = new Cpu(mem)
@@ -508,7 +508,7 @@ describe('Instructions', () => {
         const { instruction, registers: [ register ] } = getRegistersFromOpCode(opCode, /POP (\w+)$/)
 
         cpu.SP = address
-        mem.store16(uint16(value), address)
+        mem.store16(value, address)
         instruction.fn()
         expect(getRegisterValue(register)).toBe(uint8(value)       )
     })
@@ -604,7 +604,7 @@ describe('Instructions', () => {
     })
     test('DI', () => {
         cpu.instructions[0xF3].fn()
-        expect(cpu.interruptEnabled).toBe(false)
+        expect(cpu.ime).toBe(false)
     })
 })
 
@@ -613,3 +613,52 @@ describe('Instructions', () => {
  * These are pretty straightforward and already covered in alu.test.ts
 */
 describe.skip('CBxx Instructions', () => {})
+
+describe.each([
+    { ime: true}, { ime: false }
+])('Interrupts', ({ ime }) => {
+    test.each([
+        { ie: true, if_: true },
+        { ie: true, if_: false },
+        { ie: false, if_: true },
+        { ie: false, if_: false }
+    ])('V-Blank interrupt', ({ ie, if_ }) => {
+        const initialPc = 0x100
+
+        cpu.ime = ime
+        mem.IE = ie ? setBit(mem.IE, 0) : resetBit(mem.IE, 0)
+        mem.IF = if_ ? setBit(mem.IF, 0) : resetBit(mem.IF, 0)
+        cpu.PC = initialPc
+
+        if (ime && ie && if_) {
+            expect(cpu.checkForInterrupts()).toBe(true)
+            expect(cpu.pop()).toBe(initialPc)
+            expect(cpu.PC).toBe(uint16(0x0040))
+        } else {
+            expect(cpu.checkForInterrupts()).toBe(false)
+            expect(cpu.PC).toBe(uint16(initialPc))
+        }
+    })
+    test.each([
+        { ie: true, if_: true },
+        { ie: true, if_: false },
+        { ie: false, if_: true },
+        { ie: false, if_: false }
+    ])('LCD interrupt', ({ ie, if_ }) => {
+        const initialPc = 0x100
+
+        cpu.ime = ime
+        mem.IE = ie ? setBit(mem.IE, 1) : resetBit(mem.IE, 1)
+        mem.IF = if_ ? setBit(mem.IF, 1) : resetBit(mem.IF, 1)
+        cpu.PC = initialPc
+
+        if (ime && ie && if_) {
+            expect(cpu.checkForInterrupts()).toBe(true)
+            expect(cpu.pop()).toBe(initialPc)
+            expect(cpu.PC).toBe(uint16(0x0048))
+        } else {
+            expect(cpu.checkForInterrupts()).toBe(false)
+            expect(cpu.PC).toBe(uint16(initialPc))
+        }
+    })
+})

@@ -4,136 +4,135 @@ export interface IMemory {
   memory: Uint8Array
   load8(address: Uint16): Uint8
   load16(address: Uint16): Uint16
-  store8(value: Uint8, address: Uint16): void
+  store8(value: number, address: Uint16): void
   store16(value: Uint16, address: Uint16): void
   
   get rom (): Uint8Array
   set rom (value: Uint8Array)
 
-  get P1JOYP ()
-  set P1JOYP(value: Uint8)
+  get P1JOYP (): Uint8
+  set P1JOYP(value: number)
 
-  get SB ()
-  set SB(value: Uint8)
+  get SB (): Uint8
+  set SB(value: number)
 
-  get SC ()
-  set SC(value: Uint8)
+  get SC (): Uint8
+  set SC(value: number)
 
-  get DIV ()
-  set DIV(value: Uint8)
+  get DIV (): Uint8
+  set DIV(value: number)
 
-  get TIMA ()
-  set TIMA(value: Uint8)
+  get TIMA (): Uint8
+  set TIMA(value: number)
 
-  get TMA ()
-  set TMA(value: Uint8)
+  get TMA (): Uint8
+  set TMA(value: number)
 
-  get TAC ()
-  set TAC(value: Uint8)
+  get TAC (): Uint8
+  set TAC(value: number)
 
-  get IF ()
-  set IF(value: Uint8)
+  get IF (): Uint8
+  set IF(value: number)
 
-  get NR10 ()
-  set NR10(value: Uint8)
+  get NR10 (): Uint8
+  set NR10(value: number)
 
-  get NR11 ()
-  set NR11(value: Uint8)
+  get NR11 (): Uint8
+  set NR11(value: number)
 
-  get NR12 ()
-  set NR12(value: Uint8)
+  get NR12 (): Uint8
+  set NR12(value: number)
 
-  get NR13 ()
-  set NR13(value: Uint8)
+  get NR13 (): Uint8
+  set NR13(value: number)
 
-  get NR14 ()
-  set NR14(value: Uint8)
+  get NR14 (): Uint8
+  set NR14(value: number)
 
-  get NR21 ()
-  set NR21(value: Uint8)
+  get NR21 (): Uint8
+  set NR21(value: number)
 
-  get NR22 ()
-  set NR22(value: Uint8)
+  get NR22 (): Uint8
+  set NR22(value: number)
 
-  get NR23 ()
-  set NR23(value: Uint8)
+  get NR23 (): Uint8
+  set NR23(value: number)
 
-  get NR24 ()
-  set NR24(value: Uint8)
+  get NR24 (): Uint8
+  set NR24(value: number)
 
-  get NR30 ()
-  set NR30(value: Uint8)
+  get NR30 (): Uint8
+  set NR30(value: number)
 
-  get NR31 ()
-  set NR31(value: Uint8)
+  get NR31 (): Uint8
+  set NR31(value: number)
 
-  get NR32 ()
-  set NR32(value: Uint8)
+  get NR32 (): Uint8
+  set NR32(value: number)
 
-  get NR33 ()
-  set NR33(value: Uint8)
+  get NR33 (): Uint8
+  set NR33(value: number)
 
-  get NR34 ()
-  set NR34(value: Uint8)
+  get NR34 (): Uint8
+  set NR34(value: number)
 
-  get NR41 ()
-  set NR41(value: Uint8)
+  get NR41 (): Uint8
+  set NR41(value: number)
 
-  get NR42 ()
-  set NR42(value: Uint8)
+  get NR42 (): Uint8
+  set NR42(value: number)
 
-  get NR43 ()
-  set NR43(value: Uint8)
+  get NR43 (): Uint8
+  set NR43(value: number)
 
+  get NR44 (): Uint8
+  set NR44(value: number)
 
-  get NR44 ()
-  set NR44(value: Uint8)
+  get NR50 (): Uint8
+  set NR50(value: number)
 
-  get NR50 ()
-  set NR50(value: Uint8)
+  get NR51 (): Uint8
+  set NR51(value: number)
 
-  get NR51 ()
-  set NR51(value: Uint8)
+  get NR52 (): Uint8
+  set NR52(value: number)
 
-  get NR52 ()
-  set NR52(value: Uint8)
+  get LCDC (): Uint8
+  set LCDC(value: number)
 
-  get LCDC ()
-  set LCDC(value: Uint8)
+  get STAT (): Uint8
+  set STAT(value: number)
 
-  get STAT ()
-  set STAT(value: Uint8)
+  get SCY (): Uint8
+  set SCY(value: number)
 
-  get SCY ()
-  set SCY(value: Uint8)
+  get SCX (): Uint8
+  set SCX(value: number)
 
-  get SCX ()
-  set SCX(value: Uint8)
+  get LY (): Uint8
+  set LY(value: number)
 
-  get LY ()
-  set LY(value: Uint8)
+  get LYC (): Uint8
+  set LYC(value: number)
 
-  get LYC ()
-  set LYC(value: Uint8)
+  get DMA (): Uint8
+  set DMA(value: number)
 
-  get DMA ()
-  set DMA(value: Uint8)
+  get BGP (): Uint8
+  set BGP(value: number)
 
-  get BGP ()
-  set BGP(value: Uint8)
+  get OBP0 (): Uint8
+  set OBP0(value: number)
 
-  get OBP0 ()
-  set OBP0(value: Uint8)
+  get OBP1 (): Uint8
+  set OBP1(value: number)
 
-  get OBP1 ()
-  set OBP1(value: Uint8)
+  get WY (): Uint8
+  set WY(value: number)
 
-  get WY ()
-  set WY(value: Uint8)
+  get WX (): Uint8
+  set WX(value: number)
 
-  get WX ()
-  set WX(value: Uint8)
-
-  get IE ()
-  set IE(value: Uint8)
+  get IE (): Uint8
+  set IE(value: number)
 }

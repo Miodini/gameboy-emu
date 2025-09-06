@@ -42,6 +42,11 @@ export default class GameBoy implements IGameBoy {
          * and no activity will happen on the CPU for the remaining cycles
          */
         if (cpuCyclesCounter === 0) {
+          /* Check for interruptions before executing normal code flow. This takes 5 clock cycles */
+          if (this.cpu.checkForInterrupts()) {
+            cpuCyclesCounter = 5
+            continue
+          }
           cpuCyclesCounter = this.cpu.execute()
         } else {
           cpuCyclesCounter--
