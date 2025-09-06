@@ -105,5 +105,8 @@ export interface ICpu extends IAlu {
   haltFlag: boolean
   interruptEnabled: boolean
   instructions: {[opCode: number]: Instruction}
-  execute: () => void
+  /**
+   * @returns Number of cycles of currently executed instruction
+   */
+  execute: () => number
 }

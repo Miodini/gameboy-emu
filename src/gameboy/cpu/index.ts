@@ -3353,15 +3353,9 @@ export default class Cpu extends Alu implements ICpu {
     }
 
     public execute = () => {
-        if (this.stopFlag || this.haltFlag) return
+        if (this.stopFlag || this.haltFlag) return 0
         const instruction = this.instructions[uint8(this.mem.load8(this.PC))]
 
-        log.push(`0x${this.PC.toString(16).toUpperCase().padStart(4, '0')} - ${instruction.name}`)
-        if (log.length >= 1000) {
-            console.log(log)
-            log = []
-        }
-        // debugger
         this.PC++
 
         // 8 bit
@@ -3381,5 +3375,7 @@ export default class Cpu extends Alu implements ICpu {
         else {
             instruction.fn()
         }
+
+        return instruction.cycles
     }
 }

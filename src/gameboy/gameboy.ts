@@ -8,9 +8,12 @@ import Cpu from './cpu'
 import Ppu from './ppu'
 
 export default class GameBoy implements IGameBoy {
-  private cpu: ICpu
-  private mem: IMemory
-  private ppu: IPpu
+  private readonly cpu: ICpu
+  private readonly mem: IMemory
+  private readonly ppu: IPpu
+  /** In Hz */
+  private readonly clock: number = 4194304
+  private readonly cyclesPerScanline = 456
 
   constructor(canvas: OffscreenCanvas, pixelSize: number) {
     this.mem = new Memory()
@@ -31,11 +34,25 @@ export default class GameBoy implements IGameBoy {
   }
 
   public start(): void {
-    setInterval(() => {
-      for (let i = 0; i < 30; i++) {
-        this.cpu.execute()
+    const oneSecondRun = () => {
+      let cpuCyclesCounter: number = 0
+
+      for (let i = 0; i < this.clock; i++) {
+        /* Each cpu instruction will be run fully during one clock cycle,
+         * and no activity will happen on the CPU for the remaining cycles
+         */
+        if (cpuCyclesCounter === 0) {
+          cpuCyclesCounter = this.cpu.execute()
+        } else {
+          cpuCyclesCounter--
+        }
+
+        if (i % this.cyclesPerScanline === 0) {
+          this.ppu.drawScanLine()
+        }
       }
-      this.ppu.draw()
-    }, 5)
+    }
+
+    setInterval(oneSecondRun, 1000)
   }
 }

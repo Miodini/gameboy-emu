@@ -10,5 +10,5 @@ export interface IObjectPpu {
 
 export interface IPpu {
   get canvasCtx (): OffscreenCanvasRenderingContext2D
-  draw (): void
+  drawScanLine (): void
 }

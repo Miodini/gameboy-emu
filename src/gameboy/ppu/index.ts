@@ -40,7 +40,7 @@ export default class Ppu implements IPpu {
   /* The draw method of `bgPpu` and `objPpu` return arrays with color data
    * This method is the responsible for drawing the rects on the actual canvas
   */
-  public draw = () => {
+  public drawScanLine = () => {
     if (getBit(this.mem.LCDC, 7) === 1) {
       const bgScreenMatrix = this.bgPpu.draw()
       const objScreenMatrix = this.objPpu.draw()
@@ -75,19 +75,4 @@ export default class Ppu implements IPpu {
       this.mem.LY = uint8(0)
     }
   }
-
-  public _test = () => {
-    this.mem.SCX = uint8(0)
-    this.mem.SCY = uint8(0)
-    this.mem.LCDC = uint8(0xeb)
-
-    pkmnVramDump.forEach((byte, index) => {
-      this.mem.store8(uint8(byte), uint16(Addresses.VRAM + index))
-    })
-    pkmnOamDump.forEach((byte, index) => {
-      this.mem.store8(uint8(byte), uint16(Addresses.OAM + index))
-    })
-
-    this.draw()
-  } 
 }
