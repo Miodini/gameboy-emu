@@ -8,12 +8,13 @@ import Cpu from './cpu'
 import Ppu from './ppu'
 
 export default class GameBoy implements IGameBoy {
-  private readonly cpu: ICpu
-  private readonly mem: IMemory
-  private readonly ppu: IPpu
+  public readonly cpu: ICpu
+  public readonly mem: IMemory
+  public readonly ppu: IPpu
   /** In Hz */
   private readonly clock: number = 4194304
   private readonly cyclesPerScanline = 456
+  private timeoutHandler?: NodeJS.Timeout
 
   constructor(canvas: OffscreenCanvas, pixelSize: number) {
     this.mem = new Memory()
@@ -58,6 +59,10 @@ export default class GameBoy implements IGameBoy {
       }
     }
 
-    setInterval(oneSecondRun, 1000)
+    this.timeoutHandler = setInterval(oneSecondRun, 1000)
+  }
+
+  public stop() {
+    clearTimeout(this.timeoutHandler)
   }
 }

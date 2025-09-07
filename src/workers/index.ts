@@ -1,5 +1,5 @@
 import type { IGameBoy } from '../gameboy/types'
-import GameBoy from '../gameboy/gameboy'
+import GameBoy from '../gameboy'
 import { WorkerTypes as WT } from '../types'
 
 let gameBoy: IGameBoy
