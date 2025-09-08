@@ -3353,7 +3353,8 @@ export default class Cpu extends Alu implements ICpu {
     }
 
     public checkForInterrupts = () => {
-        if (this.ime) {
+        // Interrupts are still run during halt
+        if (!this.stopFlag && this.ime) {
             /*
              * There are 5 interrupt sources, from bits 0 to 4
              * This loops checks if bit `i` of IE and IF are both set and, if so,

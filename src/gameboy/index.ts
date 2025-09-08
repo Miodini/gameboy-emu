@@ -57,16 +57,24 @@ export default class GameBoy implements IGameBoy {
 
   public start(): void {
     /* Clocks In Hz */
-    const clock = 4194304
+    const mainClock = 4194304
     const divClock = 16384
     const cyclesPerScanline = 456
 
     let divClockCounter: number = divClock
 
+    /**
+     * This function emulates 1 second of the hardware running. It:
+     * - Checks for interrupts and handles them if applicable
+     * - Run instructions
+     * - Draws scanlines
+     * - Updates the TIMA timer
+     * - Updates the DIV timer
+     */
     const oneSecondRun = () => {
       let cpuCyclesCounter: number = 0
 
-      for (let i = 0; i < clock; i++) {
+      for (let i = 0; i < mainClock; i++) {
         /* Each cpu instruction will be run fully during one clock cycle,
          * and no activity will happen on the CPU for the remaining cycles
          */
@@ -92,7 +100,7 @@ export default class GameBoy implements IGameBoy {
             this.mem.TIMA++
           }
         }
-        /** DIV register is increased at 16384Hz */
+        /* DIV register is increased at 16384Hz */
         divClockCounter--
         if (divClockCounter === 0 && !this.cpu.stopFlag) {
           this.mem.DIV++
