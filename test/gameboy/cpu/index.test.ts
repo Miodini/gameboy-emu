@@ -1,9 +1,9 @@
 /** Important: when testing registers, make sure to cast the `toBe` argument to the same data type (signed vs unsigned) */
-import { jest, describe, expect, test, beforeEach } from '@jest/globals'
+import { jest, describe, expect, test, it, beforeEach } from '@jest/globals'
 import Cpu from '../../../src/gameboy/cpu'
 import Memory from '../../../src/gameboy/memory'
 import { setBit, resetBit, int8, uint8, int16, uint16 } from '../../../src/utils.js'
-import type { Bit, Uint8, Uint16 } from '../../../src/types.js'
+import type { Bit, BitPosition, Uint8, Uint16 } from '../../../src/types.js'
 jest.mock('../../../src/gameboy/cpu')
 
 const mem = new Memory()
@@ -614,51 +614,31 @@ describe('Instructions', () => {
 */
 describe.skip('CBxx Instructions', () => {})
 
-describe.each([
-    { ime: true}, { ime: false }
-])('Interrupts', ({ ime }) => {
-    test.each([
+describe('Interrupts', () => {
+    it.each([
         { ie: true, if_: true },
         { ie: true, if_: false },
         { ie: false, if_: true },
         { ie: false, if_: false }
-    ])('V-Blank interrupt', ({ ie, if_ }) => {
+    ])('should handle the interrupts', ({ ie, if_ }) => {
         const initialPc = 0x100
 
-        cpu.ime = ime
-        mem.IE = ie ? setBit(mem.IE, 0) : resetBit(mem.IE, 0)
-        mem.IF = if_ ? setBit(mem.IF, 0) : resetBit(mem.IF, 0)
-        cpu.PC = initialPc
-
-        if (ime && ie && if_) {
-            expect(cpu.checkForInterrupts()).toBe(true)
-            expect(cpu.pop()).toBe(initialPc)
-            expect(cpu.PC).toBe(uint16(0x0040))
-        } else {
-            expect(cpu.checkForInterrupts()).toBe(false)
-            expect(cpu.PC).toBe(uint16(initialPc))
-        }
-    })
-    test.each([
-        { ie: true, if_: true },
-        { ie: true, if_: false },
-        { ie: false, if_: true },
-        { ie: false, if_: false }
-    ])('LCD interrupt', ({ ie, if_ }) => {
-        const initialPc = 0x100
-
-        cpu.ime = ime
-        mem.IE = ie ? setBit(mem.IE, 1) : resetBit(mem.IE, 1)
-        mem.IF = if_ ? setBit(mem.IF, 1) : resetBit(mem.IF, 1)
-        cpu.PC = initialPc
-
-        if (ime && ie && if_) {
-            expect(cpu.checkForInterrupts()).toBe(true)
-            expect(cpu.pop()).toBe(initialPc)
-            expect(cpu.PC).toBe(uint16(0x0048))
-        } else {
-            expect(cpu.checkForInterrupts()).toBe(false)
-            expect(cpu.PC).toBe(uint16(initialPc))
+        cpu.ime = true
+        
+        for (let bit: BitPosition = 0; bit <= 4; bit++) {
+            bit = bit as BitPosition
+            mem.IE = ie ? setBit(mem.IE, bit) : resetBit(mem.IE, bit)
+            mem.IF = if_ ? setBit(mem.IF, bit) : resetBit(mem.IF, bit)
+            cpu.PC = initialPc
+    
+            if (ie && if_) {
+                expect(cpu.checkForInterrupts()).toBe(true)
+                expect(cpu.pop()).toBe(initialPc)
+                expect(cpu.PC).toBe(uint16(0x0040 + (bit * 8)))
+            } else {
+                expect(cpu.checkForInterrupts()).toBe(false)
+                expect(cpu.PC).toBe(uint16(initialPc))
+            }
         }
     })
 })

@@ -113,7 +113,10 @@ export default class Cpu extends Alu implements ICpu {
             // Opcode is 2 byte-long
             args: 1,
             cycles: 4,
-            fn: () => this.stopFlag = true
+            fn: () => {
+                this.stopFlag = true
+                this.mem.DIV = 0
+            }
         },
         0x11: {
             name: 'LD DE,d16',

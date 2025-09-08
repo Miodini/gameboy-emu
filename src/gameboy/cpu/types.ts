@@ -94,7 +94,9 @@ export interface IAlu extends IRegisters {
   /* ----- BIT OPERATIONS ----- */
   bit (bit: BitPosition, value: Uint8): void
   res (bit: BitPosition, value: Uint8): Uint8
+  /* ----- STACK OPERATIONS -----*/
   push (value: Uint16): void
+  pop (): Uint16
   /* ----- CODE FLOW OPERATIONS ----- */
   call (address: Uint16): void
   ret (): void

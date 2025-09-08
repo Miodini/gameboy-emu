@@ -6,14 +6,13 @@ import type { IGameBoy } from './types'
 import Memory from './memory'
 import Cpu from './cpu'
 import Ppu from './ppu'
+import { getBit } from '../utils'
 
 export default class GameBoy implements IGameBoy {
   public readonly cpu: ICpu
   public readonly mem: IMemory
   public readonly ppu: IPpu
-  /** In Hz */
-  private readonly clock: number = 4194304
-  private readonly cyclesPerScanline = 456
+
   private timeoutHandler?: NodeJS.Timeout
 
   constructor(canvas: OffscreenCanvas, pixelSize: number) {
@@ -34,11 +33,40 @@ export default class GameBoy implements IGameBoy {
     this.cpu.haltFlag = !this.cpu.haltFlag
   }
 
+  private getTacTimerFrequency(): number {
+    let timerFrequency: number
+
+    switch (this.mem.TAC & 0x3) {
+    case 0:
+      timerFrequency = 4096
+      break
+    case 1:
+      timerFrequency = 262144
+      break
+    case 2:
+      timerFrequency = 65536
+      break
+    case 3:
+    default:
+      timerFrequency = 16384
+      break
+    }
+
+    return timerFrequency
+  }
+
   public start(): void {
+    /* Clocks In Hz */
+    const clock = 4194304
+    const divClock = 16384
+    const cyclesPerScanline = 456
+
+    let divClockCounter: number = divClock
+
     const oneSecondRun = () => {
       let cpuCyclesCounter: number = 0
 
-      for (let i = 0; i < this.clock; i++) {
+      for (let i = 0; i < clock; i++) {
         /* Each cpu instruction will be run fully during one clock cycle,
          * and no activity will happen on the CPU for the remaining cycles
          */
@@ -53,8 +81,22 @@ export default class GameBoy implements IGameBoy {
           cpuCyclesCounter--
         }
 
-        if (i % this.cyclesPerScanline === 0) {
+        if (i % cyclesPerScanline === 0) {
           this.ppu.drawScanLine()
+        }
+        
+        if (getBit(this.mem.TAC, 2)) {
+          const tacTimerFrequency = this.getTacTimerFrequency()
+  
+          if (i % tacTimerFrequency === 0) {
+            this.mem.TIMA++
+          }
+        }
+        /** DIV register is increased at 16384Hz */
+        divClockCounter--
+        if (divClockCounter === 0 && !this.cpu.stopFlag) {
+          this.mem.DIV++
+          divClockCounter = divClock
         }
       }
     }

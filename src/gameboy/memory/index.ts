@@ -1,6 +1,6 @@
 import type { IMemory } from './types'
 import type { Uint8, Uint16 } from '../../types'
-import { uint8, uint16 } from '../../utils'
+import { setBit, uint8, uint16 } from '../../utils'
 
 const FORCE_VBLANK = false
 
@@ -31,6 +31,10 @@ export default class Memory implements IMemory {
     }
 
     store8 (value: number, position: Uint16): void {
+        if (position === 0xFF04) {
+            // Writing to DIV register resets it to 0
+            value = 0
+        }
         this.memory[position] = value
     }
     
@@ -82,6 +86,13 @@ export default class Memory implements IMemory {
         return this.load8(uint16(0xFF05))
     }
     set TIMA (value: number) {
+        /* When this values overflows, it raises an interrupt request
+         * and its value is reset to TMA
+        */
+        if (value > 0xFF) {
+            value = this.TMA
+            this.IF = setBit(this.IF, 2)
+        }
         this.store8(value, uint16(0xFF05))
     }
 
@@ -224,7 +235,6 @@ export default class Memory implements IMemory {
     set NR43 (value: number) {
         this.store8(value, uint16(0xFF22))
     }
-
 
     get NR44 (): Uint8 {
         return this.load8(uint16(0xFF23))
